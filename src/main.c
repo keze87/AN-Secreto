@@ -30,10 +30,21 @@ struct vectorDatos {
 
 };
 
-float fcf (int potencia, double factorUso, float costoElec, int costoPot, int costos, float ganancias) {
+double ahorroElectricidad (int potencia, double factorUso, float costoElec) {
 
-	return (potencia * HORASPORANIO * factorUso * costoElec + potencia * FACTORREDUCCIONPOTENCIA * costoPot * MESES \
-			- costos) * (1 - ganancias) ;
+	return (potencia * HORASPORANIO * factorUso * costoElec);
+
+}
+
+double ahorroPotencia (int potencia, int costoPot) {
+
+	return (potencia * FACTORREDUCCIONPOTENCIA * costoPot * MESES);
+
+}
+
+double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float ganancias) {
+
+	return (ahorroElectricidad + ahorroPotencia - costos) * (1 - ganancias) ;
 
 }
 
@@ -41,7 +52,7 @@ struct vectorDatos cargarDatos () {
 
 	struct vectorDatos aux;
 
-	aux.potencia				= 30000;
+	aux.potencia				= 30;
 	aux.costoUnitarioPotencia	= 1800;
 	aux.costos					= 5000;
 	aux.ganancias				= 0.35;
@@ -53,11 +64,17 @@ struct vectorDatos cargarDatos () {
 
 }
 
+int imprimirTabla (struct vectorDatos datos) {
+
+	return TRUE;
+
+}
+
 int proceso () {
 
 	struct vectorDatos datos = cargarDatos();
 
-	//imprimirTabla(datos);
+	imprimirTabla(datos);
 
 	/*buscarTIRBiseccion();
 

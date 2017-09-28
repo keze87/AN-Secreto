@@ -28,5 +28,7 @@ struct vectorDatos {
 
 };
 
-float fcf (int potencia, double factorUso, float costoElec, int costoPot, int costos, float ganancias);
+double ahorroElectricidad (int potencia, double factorUso, float costoElec);
+double ahorroPotencia (int potencia, int costoPot);
+double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float ganancias);
 struct vectorDatos cargarDatos ();

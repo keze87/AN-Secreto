@@ -5,7 +5,13 @@ TEST testCalcularFCF (void) {
 
 	double factorUso = 0.18 * NUMERODEPADRON / 100000;
 
-	GREATEST_ASSERT_IN_RANGE(7.44652e+07, fcf(30000,factorUso,1.9,250,5000,0.35), 0.1);
+	double ahorroElec = ahorroElectricidad(30, factorUso, 1.9);
+	double ahorroPot = ahorroPotencia(30, 250);
+
+	GREATEST_ASSERT_IN_RANGE(87566.846904, ahorroElec, 0.01);
+	GREATEST_ASSERT_EQ(27000, ahorroPot);
+
+	GREATEST_ASSERT_IN_RANGE(71218.4504876, fcf(ahorroElec, ahorroPot, 5000, 0.35), 0.01);
 
 	PASS();
 
@@ -15,7 +21,7 @@ TEST testCargarDatos (void) {
 
 	struct vectorDatos datos = cargarDatos();
 
-	GREATEST_ASSERT_EQ(30000,	datos.potencia);
+	GREATEST_ASSERT_EQ(30,		datos.potencia);
 	GREATEST_ASSERT_EQ(1800,	datos.costoUnitarioPotencia);
 	GREATEST_ASSERT_EQ(5000,	datos.costos);
 
