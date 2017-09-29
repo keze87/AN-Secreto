@@ -94,15 +94,14 @@ void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 char * redondear (double numero) {
 
-	char * aux = malloc(sizeof(char) * 30);
-	char * auxInteger = malloc(sizeof(char) * 30);
+	char * aux = malloc(sizeof(char) * 31);
+	char * auxInteger = malloc(sizeof(char) * 31);
 	char auxModulo[30];
 
 	int entero = round(numero);
-	int moduloEntero = fabs(round(numero));
 
 	snprintf(auxInteger, 30, "%d", entero);
-	snprintf(auxModulo, 30, "%d", moduloEntero);
+	snprintf(auxModulo, 30, "%d", abs(entero));
 
 	if (strlen(auxModulo) >= 3) {
 
@@ -114,7 +113,7 @@ char * redondear (double numero) {
 
 		snprintf(aux, 30, "%.1f", numero);
 
-	} else if (strlen(auxModulo) >= 1) {
+	} else {
 
 		snprintf(aux, 30, "%.2f", numero);
 
@@ -126,22 +125,90 @@ char * redondear (double numero) {
 
 }
 
+void cargarMatrizRedondada (char * matriz[6][6], double matrizDatos[5][N+1]) {
+
+	// Pido memoria para los titulos
+	matriz[0][0] = malloc(sizeof(char) * 2);
+
+	for (int i = 1; i < 6; i++) {
+
+		matriz[i][0] = malloc(sizeof(char) * 22);
+		matriz[i][4] = malloc(sizeof(char) * 4);
+		matriz[0][i] = malloc(sizeof(char) * 22);
+
+	}
+
+	// Escribo los titulos
+	strcpy(matriz[0][0], " "); strcpy(matriz[0][1], "Año 0"); strcpy(matriz[0][2], "Año 1"); \
+					strcpy(matriz[0][3], "Año 2"); strcpy(matriz[0][4], "..."); strcpy(matriz[0][5], "Año N");
+	strcpy(matriz[1][0], "Inversión");				strcpy(matriz[1][4], "...");
+	strcpy(matriz[2][0], "Ahorro electricidad");	strcpy(matriz[2][4], "...");
+	strcpy(matriz[3][0], "Ahorro potencia");		strcpy(matriz[3][4], "...");
+	strcpy(matriz[4][0], "Costos");					strcpy(matriz[4][4], "...");
+	strcpy(matriz[5][0], "FCF");					strcpy(matriz[5][4], "...");
+
+	// Agrego los datos
+	for (int i = 1; i <= 3; i++) {
+
+		// Inversiones
+		matriz[1][i] = redondear(matrizDatos[0][i - 1]); strcat(matriz[1][i], " $");
+
+		// Ahorros E
+		matriz[2][i] = redondear(matrizDatos[1][i - 1]); strcat(matriz[2][i], " $");
+
+		// Ahorros P
+		matriz[3][i] = redondear(matrizDatos[2][i - 1]); strcat(matriz[3][i], " $");
+
+		// Costos
+		matriz[4][i] = redondear(matrizDatos[3][i - 1]); strcat(matriz[4][i], " $");
+
+		// FCFs
+		matriz[5][i] = redondear(matrizDatos[4][i - 1]);
+
+	}
+
+	// Año n
+	// Inversiones
+	matriz[1][5] = redondear(matrizDatos[0][N]); strcat(matriz[1][5], " $");
+
+	// Ahorros E
+	matriz[2][5] = redondear(matrizDatos[1][N]); strcat(matriz[2][5], " $");
+
+	// Ahorros P
+	matriz[3][5] = redondear(matrizDatos[2][N]); strcat(matriz[3][5], " $");
+
+	// Costos
+	matriz[4][5] = redondear(matrizDatos[3][N]); strcat(matriz[4][5], " $");
+
+	// FCFs
+	matriz[5][5] = redondear(matrizDatos[4][N]);
+
+}
+
+void liberarMemoriaMatriz (char * matriz[6][6]) {
+
+	for (int i = 0; i <= 5; i++)
+		for (int j = 0; j <= 5; j++)
+			free(matriz[i][j]);
+
+}
+
 int imprimirTabla (struct vectorDatos datos) {
 
 	double matriz [5][N+1];
+	char * matrizRedondeada [6][6];
 
 	cargarMatriz(matriz,datos);
+	cargarMatrizRedondada(matrizRedondeada,matriz);
 
-	//TODO
-	for (int i = 0; i <= 4; i++) {
-		for (int j = 0; j <= 2; j++) {
-
-			printf("%s", redondear(matriz[i][j]));
-
-			if (j != 2) { printf ("   "); }
-			else { printf("\n"); }
+	for (int i = 0; i <= 5; i++) {
+		for (int j = 0; j <= 5; j++) {
+			printf("%s   ", matrizRedondeada[i][j]);
 		}
+		printf("\n");
 	}
+
+	liberarMemoriaMatriz(matrizRedondeada);
 
 	return TRUE;
 
