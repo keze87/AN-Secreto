@@ -139,9 +139,9 @@ void cargarMatrizRedondada (char * matriz[6][6], double matrizDatos[5][N+1]) {
 	}
 
 	// Escribo los titulos
-	strcpy(matriz[0][0], " "); strcpy(matriz[0][1], "Año 0"); strcpy(matriz[0][2], "Año 1"); \
-					strcpy(matriz[0][3], "Año 2"); strcpy(matriz[0][4], "..."); strcpy(matriz[0][5], "Año N");
-	strcpy(matriz[1][0], "Inversión");				strcpy(matriz[1][4], "...");
+	strcpy(matriz[0][0], " "); strcpy(matriz[0][1], "Anio 0"); strcpy(matriz[0][2], "Anio 1"); \
+					strcpy(matriz[0][3], "Anio 2"); strcpy(matriz[0][4], "..."); strcpy(matriz[0][5], "Anio N");
+	strcpy(matriz[1][0], "Inversion");				strcpy(matriz[1][4], "...");
 	strcpy(matriz[2][0], "Ahorro electricidad");	strcpy(matriz[2][4], "...");
 	strcpy(matriz[3][0], "Ahorro potencia");		strcpy(matriz[3][4], "...");
 	strcpy(matriz[4][0], "Costos");					strcpy(matriz[4][4], "...");
@@ -193,6 +193,91 @@ void liberarMemoriaMatriz (char * matriz[6][6]) {
 
 }
 
+void calcularAnchoFilas (int anchos[6], char * matriz[6][6]) {
+
+	for (int i = 0; i < 6; i++)
+		anchos[i] = 0;
+
+	for (int j = 0; j < 6; j++) {
+
+		for (int i = 0; i < 6; i++) {
+
+			if (strlen(matriz[i][j]) > anchos[j])
+				anchos[j] = strlen(matriz[i][j]);
+
+		}
+
+	}
+
+}
+
+void imprimirLineaSeparadora (int anchos[6]) {
+
+	int i = 0;
+
+	int anchoTotal = 0;
+
+	for (int j = 0; j < 6; j++)
+		anchoTotal = anchoTotal + anchos[j];
+
+	anchoTotal = anchoTotal + 5 * 3; // Tamaño separador
+
+	printf("\n");
+
+	while (i < anchoTotal) {
+
+		printf("-");
+
+		i++;
+
+	}
+
+	printf("\n");
+
+}
+
+void imprimirSeparador (int anchoElemento, int anchoFila) {
+
+	int aux = anchoElemento;
+
+	while (aux < anchoFila) {
+
+		printf(" ");
+
+		aux++;
+
+	}
+
+	printf(" | ");
+
+}
+
+void imprimirMatriz (char * matriz[6][6]) {
+
+	int anchos [6];
+
+	calcularAnchoFilas(anchos, matriz);
+
+	for (int i = 0; i < 6; i++) {
+
+		for (int j = 0; j < 6; j++) {
+
+			printf("%s", matriz[i][j]);
+
+			if (j != 5)
+				imprimirSeparador(strlen(matriz[i][j]), anchos[j]);
+
+		}
+
+		if (i != 5)
+			imprimirLineaSeparadora(anchos);
+
+	}
+
+	printf("\n");
+
+}
+
 int imprimirTabla (struct vectorDatos datos) {
 
 	double matriz [5][N+1];
@@ -201,12 +286,7 @@ int imprimirTabla (struct vectorDatos datos) {
 	cargarMatriz(matriz,datos);
 	cargarMatrizRedondada(matrizRedondeada,matriz);
 
-	for (int i = 0; i <= 5; i++) {
-		for (int j = 0; j <= 5; j++) {
-			printf("%s   ", matrizRedondeada[i][j]);
-		}
-		printf("\n");
-	}
+	imprimirMatriz(matrizRedondeada);
 
 	liberarMemoriaMatriz(matrizRedondeada);
 
