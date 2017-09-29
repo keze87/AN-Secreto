@@ -35,10 +35,28 @@ TEST testCargarDatos (void) {
 
 }
 
+TEST testRedondeoNumero (void) {
+
+	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1),				"%d"); // 1.00
+	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1.00015456),		"%d"); // 1.00
+	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1000.1),			"%d"); // 1000
+	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(-0.0006),			"%d"); // -0.00
+	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(71218.4504876),	"%d"); // 71218
+	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(87566.846904),		"%d"); // 87567
+	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1.846904),			"%d"); // 1.85
+	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(10.846904),		"%d"); // 10.8
+	GREATEST_ASSERT_EQ_FMT(3,largoDeNumeroRedondeado(100.846904),		"%d"); // 101
+	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(-10.846904),		"%d"); // -10.8
+
+	PASS();
+
+}
+
 SUITE (suiteTests) {
 
 	RUN_TEST(testCalcularFCF);
 	RUN_TEST(testCargarDatos);
+	RUN_TEST(testRedondeoNumero);
 
 }
 
