@@ -32,4 +32,4 @@ double ahorroElectricidad (int potencia, double factorUso, float costoElec);
 double ahorroPotencia (int potencia, int costoPot);
 double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float ganancias);
 struct vectorDatos cargarDatos ();
-int largoDeNumeroRedondeado (double numero);
+char * redondear (double numero);

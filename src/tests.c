@@ -37,26 +37,45 @@ TEST testCargarDatos (void) {
 
 TEST testRedondeoNumero (void) {
 
-	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1),				"%d"); // 1.00
-	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1.00015456),		"%d"); // 1.00
-	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1000.1),			"%d"); // 1000
-	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(-0.0006),			"%d"); // -0.00
-	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(71218.4504876),	"%d"); // 71218
-	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(87566.846904),		"%d"); // 87567
-	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(1.846904),			"%d"); // 1.85
-	GREATEST_ASSERT_EQ_FMT(4,largoDeNumeroRedondeado(10.846904),		"%d"); // 10.8
-	GREATEST_ASSERT_EQ_FMT(3,largoDeNumeroRedondeado(100.846904),		"%d"); // 101
-	GREATEST_ASSERT_EQ_FMT(5,largoDeNumeroRedondeado(-10.846904),		"%d"); // -10.8
+	char * aux;
+
+	aux = redondear(1);
+	GREATEST_ASSERT_STR_EQ("1.00",	aux); free(aux);
+
+	aux = redondear(1.00015456);
+	GREATEST_ASSERT_STR_EQ("1.00",	aux); free(aux);
+
+	aux = redondear(1000.1);
+	GREATEST_ASSERT_STR_EQ("1000",	aux); free(aux);
+
+	aux = redondear(-0.0006);
+	GREATEST_ASSERT_STR_EQ("-0.00",	aux); free(aux);
+
+	aux = redondear(71218.4504876);
+	GREATEST_ASSERT_STR_EQ("71218",	aux); free(aux);
+
+	aux = redondear(87566.846904);
+	GREATEST_ASSERT_STR_EQ("87567",	aux); free(aux);
+
+	aux = redondear(1.846904);
+	GREATEST_ASSERT_STR_EQ("1.85",	aux); free(aux);
+
+	aux = redondear(10.846904);
+	GREATEST_ASSERT_STR_EQ("10.8",	aux); free(aux);
+
+	aux = redondear(100.846904);
+	GREATEST_ASSERT_STR_EQ("101",	aux); free(aux);
+
+	aux = redondear(-1.846904);
+	GREATEST_ASSERT_STR_EQ("-1.85",	aux); free(aux);
+
+	aux = redondear(-10.846904);
+	GREATEST_ASSERT_STR_EQ("-10.8",	aux); free(aux);
+
+	aux = redondear(-100.846904);
+	GREATEST_ASSERT_STR_EQ("-101",	aux); free(aux);
 
 	PASS();
-
-}
-
-SUITE (suiteTests) {
-
-	RUN_TEST(testCalcularFCF);
-	RUN_TEST(testCargarDatos);
-	RUN_TEST(testRedondeoNumero);
 
 }
 
@@ -67,7 +86,9 @@ int correrTests () {
 
 	GREATEST_MAIN_BEGIN();
 
-	RUN_SUITE(suiteTests);
+	RUN_TEST(testCalcularFCF);
+	RUN_TEST(testCargarDatos);
+	RUN_TEST(testRedondeoNumero);
 
 	GREATEST_MAIN_END();
 

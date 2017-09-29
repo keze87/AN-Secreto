@@ -3,6 +3,7 @@
 #include "tests.h" // Pruebas Unitarias
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -91,10 +92,10 @@ void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 }
 
-int largoDeNumeroRedondeado (double numero) {
+char * redondear (double numero) {
 
-	char aux[30];
-	char auxInteger[30];
+	char * aux = malloc(sizeof(char) * 30);
+	char * auxInteger = malloc(sizeof(char) * 30);
 	char auxModulo[30];
 
 	int entero = round(numero);
@@ -105,9 +106,9 @@ int largoDeNumeroRedondeado (double numero) {
 
 	if (strlen(auxModulo) >= 3) {
 
-		//TODO
-		printf("%s\n",auxInteger);
-		return strlen(auxInteger);
+		free(aux);
+
+		return auxInteger;
 
 	} else if (strlen(auxModulo) >= 2) {
 
@@ -119,10 +120,9 @@ int largoDeNumeroRedondeado (double numero) {
 
 	}
 
-	//TODO
-	printf("%s\n",aux);
+	free(auxInteger);
 
-	return strlen(aux);
+	return aux;
 
 }
 
@@ -133,15 +133,15 @@ int imprimirTabla (struct vectorDatos datos) {
 	cargarMatriz(matriz,datos);
 
 	//TODO
-	/*for (int i = 0; i <= 4; i++) {
-		for (int j = 0; j <= N; j++) {
+	for (int i = 0; i <= 4; i++) {
+		for (int j = 0; j <= 2; j++) {
 
-			printf("%.1f",matriz[i][j]);
+			printf("%s", redondear(matriz[i][j]));
 
-			if (j != N) { printf (" "); }
-			else { printf("\n\n"); }
+			if (j != 2) { printf ("   "); }
+			else { printf("\n"); }
 		}
-	}*/
+	}
 
 	return TRUE;
 
