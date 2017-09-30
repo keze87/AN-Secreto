@@ -18,6 +18,10 @@
 #define FACTORREDUCCIONPOTENCIA 0.3
 #define DOLARAPESO 17.5
 
+#define MAXITERACIONES 32000
+//TODO
+#define MAXERROR 0.00000000005
+
 struct vectorDatos {
 
 	// Inversion inicial
@@ -69,6 +73,7 @@ struct vectorDatos cargarDatos () {
 
 }
 
+// Calcula los datos
 void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 	// Inversion inicial
@@ -98,10 +103,10 @@ char * redondear (double numero) {
 	char * auxInteger = malloc(sizeof(char) * 31);
 	char auxModulo[30];
 
-	int entero = round(numero);
+	long entero = round(numero);
 
-	snprintf(auxInteger, 30, "%d", entero);
-	snprintf(auxModulo, 30, "%d", abs(entero));
+	snprintf(auxInteger, 30, "%li", entero);
+	snprintf(auxModulo, 30, "%li", labs(entero));
 
 	if (strlen(auxModulo) >= 3) {
 
@@ -125,6 +130,7 @@ char * redondear (double numero) {
 
 }
 
+// Llena una matriz con los titulos y los números redondeados
 void cargarMatrizRedondada (char * matriz[6][6], double matrizDatos[5][N+1]) {
 
 	// Pido memoria para los titulos
@@ -193,17 +199,18 @@ void liberarMemoriaMatriz (char * matriz[6][6]) {
 
 }
 
-void calcularAnchoFilas (int anchos[6], char * matriz[6][6]) {
+// Busca el largo del elemento mas largo de cada columna
+void calcularAnchoColumnas (int anchos[6], char * matriz[6][6]) {
 
 	for (int i = 0; i < 6; i++)
 		anchos[i] = 0;
 
-	for (int j = 0; j < 6; j++) {
+	for (int i = 0; i < 6; i++) {
 
-		for (int i = 0; i < 6; i++) {
+		for (int j = 0; j < 6; j++) {
 
-			if (strlen(matriz[i][j]) > anchos[j])
-				anchos[j] = strlen(matriz[i][j]);
+			if (strlen(matriz[j][i]) > anchos[i])
+				anchos[i] = strlen(matriz[j][i]);
 
 		}
 
@@ -211,6 +218,7 @@ void calcularAnchoFilas (int anchos[6], char * matriz[6][6]) {
 
 }
 
+// Imprime linea entre filas
 void imprimirLineaSeparadora (int anchos[6]) {
 
 	int i = 0;
@@ -236,6 +244,7 @@ void imprimirLineaSeparadora (int anchos[6]) {
 
 }
 
+// Imprime espacios y un separador
 void imprimirSeparador (int anchoElemento, int anchoFila) {
 
 	int aux = anchoElemento;
@@ -252,11 +261,12 @@ void imprimirSeparador (int anchoElemento, int anchoFila) {
 
 }
 
+// Imprime matriz de Strings agregando separadores
 void imprimirMatriz (char * matriz[6][6]) {
 
 	int anchos [6];
 
-	calcularAnchoFilas(anchos, matriz);
+	calcularAnchoColumnas(anchos, matriz);
 
 	for (int i = 0; i < 6; i++) {
 
@@ -278,12 +288,11 @@ void imprimirMatriz (char * matriz[6][6]) {
 
 }
 
-int imprimirTabla (struct vectorDatos datos) {
+// Calcula datos y manda a imprimir
+int imprimirTabla (double matriz[5][N+1]) {
 
-	double matriz [5][N+1];
 	char * matrizRedondeada [6][6];
 
-	cargarMatriz(matriz,datos);
 	cargarMatrizRedondada(matrizRedondeada,matriz);
 
 	imprimirMatriz(matrizRedondeada);
@@ -294,14 +303,110 @@ int imprimirTabla (struct vectorDatos datos) {
 
 }
 
+double potencia (double x, int n) {
+
+	double aux = 1;
+
+	for (int i = 1; i <= n; i++) {
+
+		aux = aux * x;
+
+	}
+
+	return aux;
+
+}
+
+double sumatoriaVan (double arrayFCF[N+1], double x) {
+
+	double aux = 0;
+
+	for (int i = 0; i < N + 1; i++) {
+
+		aux = aux + arrayFCF[i] / potencia(1 + x, i);
+
+	}
+
+	return aux;
+
+}
+
+double van (double i, int inversion, double arrayFCF[N+1]) {
+
+	return inversion + sumatoriaVan(arrayFCF,i);
+
+}
+
+int biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
+
+	int i = 1;
+
+	double puntoMedio;
+
+	if ( ! ((intervaloMin < intervaloMax) && \
+			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
+
+			printf("No se puede resolver por biseccion.\n");
+
+			return FALSE;
+
+	}
+
+	printf("Biseccion: ");
+
+	while (i < MAXITERACIONES) {
+
+		puntoMedio = (intervaloMin + intervaloMax) / 2;
+
+		if ((van(puntoMedio, inversion, arrayFCF) == 0) || ((intervaloMax - intervaloMin) / 2) < MAXERROR) {
+
+			break; // Encontre solucion
+
+		}
+
+		if (van(intervaloMin, inversion, arrayFCF) * van(puntoMedio, inversion, arrayFCF) < 0) {
+
+			intervaloMax = puntoMedio;
+
+		} else {
+
+			intervaloMin = puntoMedio;
+
+		}
+
+		i++;
+
+	}
+
+	printf("%.2f\n", puntoMedio);
+
+	return TRUE;
+
+}
+
+int buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
+
+	biseccion(inversion, arrayFCF, 0.02, 0.06);
+
+	return TRUE;
+
+}
+
 int proceso () {
 
 	struct vectorDatos datos = cargarDatos();
 
-	imprimirTabla(datos);
+	double matriz [5][N+1];
+	cargarMatriz(matriz,datos);
 
-	/*buscarTIRBiseccion();
-	buscarTIRPuntoFijo();
+	//TODO
+	//imprimirEnunciado(1);
+	imprimirTabla(matriz);
+
+	//imprimirEnunciado(2);
+	buscarTIRBiseccion(matriz[0][0], matriz[4]);
+
+	/*buscarTIRPuntoFijo();
 	buscarTIRSecante();
 	buscarTIREscenarios();*/
 

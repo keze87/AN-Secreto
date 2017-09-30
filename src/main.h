@@ -11,6 +11,10 @@
 #define FACTORREDUCCIONPOTENCIA 0.3
 #define DOLARAPESO 17.5
 
+#define MAXITERACIONES 32000
+//TODO
+#define MAXERROR 0.00000000005
+
 struct vectorDatos {
 
 	// Inversion inicial
