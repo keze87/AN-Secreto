@@ -37,3 +37,4 @@ double ahorroPotencia (int potencia, int costoPot);
 double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float ganancias);
 struct vectorDatos cargarDatos ();
 char * redondear (double numero);
+char * biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax);

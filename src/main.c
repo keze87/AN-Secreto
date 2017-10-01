@@ -337,22 +337,22 @@ double van (double i, int inversion, double arrayFCF[N+1]) {
 
 }
 
-int biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
+char * biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
 
 	int i = 1;
 
 	double puntoMedio;
 
+	char * aux = malloc(sizeof(char) * 40);
+
 	if ( ! ((intervaloMin < intervaloMax) && \
 			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
 
-			printf("No se puede resolver por biseccion.\n");
+			strcpy(aux, "No se puede resolver por biseccion.");
 
-			return FALSE;
+			return aux;
 
 	}
-
-	printf("Biseccion: ");
 
 	while (i < MAXITERACIONES) {
 
@@ -378,17 +378,16 @@ int biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double 
 
 	}
 
-	printf("%.2f\n", puntoMedio);
+	strcpy(aux, redondear(puntoMedio));
 
-	return TRUE;
+	return aux;
 
 }
 
-int buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
+void buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
 
-	biseccion(inversion, arrayFCF, 0.02, 0.06);
-
-	return TRUE;
+	// Busco en un intervalo [0.02, 0.06]
+	printf("%s\n", biseccion(inversion, arrayFCF, 0.02, 0.06));
 
 }
 

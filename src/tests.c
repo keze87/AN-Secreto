@@ -79,6 +79,23 @@ TEST testRedondeoNumero (void) {
 
 }
 
+TEST testIntervaloBiseccion (void) {
+
+	// Cargo array con FCF
+	double arrayFCF[N+1];
+	for (int i = 0; i < N+1; i++)
+		arrayFCF[i] = 71218;
+
+	char * aux = biseccion(-945000, arrayFCF, 1, 2);
+	GREATEST_ASSERT_STR_EQ("No se puede resolver por biseccion.", aux); free(aux);
+
+	aux = biseccion(-945000, arrayFCF, 0, 2);
+	GREATEST_ASSERT_STR_EQ("0.05", aux); free(aux);
+
+	PASS();
+
+}
+
 // Main de pruebas unitarias:
 GREATEST_MAIN_DEFS();
 
@@ -89,6 +106,7 @@ int correrTests () {
 	RUN_TEST(testCalcularFCF);
 	RUN_TEST(testCargarDatos);
 	RUN_TEST(testRedondeoNumero);
+	RUN_TEST(testIntervaloBiseccion);
 
 	GREATEST_MAIN_END();
 
