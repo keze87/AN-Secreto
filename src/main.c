@@ -12,14 +12,14 @@
 #define TRUE 0
 #define FALSE 1
 
+#define MAXITERACIONES 32000
+#define FRACASO -32000
+
 #define N 20
 #define MESES 12
 #define HORASPORANIO 8760
 #define FACTORREDUCCIONPOTENCIA 0.3
 #define DOLARAPESO 17.5
-
-#define MAXITERACIONES 32000
-#define FRACASO -32000
 
 struct vectorDatos {
 
@@ -388,13 +388,75 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 }
 
-void buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
-
-	printf("Raiz por biseccion: ");
+double buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
 
 	// Busco en un intervalo [0.02, 0.06]
-	//TODO error
-	printf("%s +/- 0.01\n", redondear(biseccion(inversion, arrayFCF, 0.02, 0.06)));
+	double raiz = biseccion(inversion, arrayFCF, 0.02, 0.06);
+
+	if (raiz != FRACASO) {
+
+		printf("Raiz por biseccion: ");
+
+		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
+
+	}
+
+	return raiz;
+
+}
+
+double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
+
+	int i = 1;
+	double Xi1;
+	double Xi = semilla;
+	double fXi;
+	double errorPF;
+
+	while (i < MAXITERACIONES) {
+
+		fXi = van (Xi, inversion, arrayFCF);
+
+		printf("%F\n",fXi);
+
+		Xi1 = Xi - fXi;
+
+		errorPF = fabs(Xi1 - Xi);
+
+		if (errorPF > 1) {
+
+			printf("No se puede resolver por puntoFijo.\n");
+
+			return FRACASO;
+
+		} else if (errorPF < 0.00005) {
+
+			break;
+
+		}
+
+		Xi = Xi1;
+
+		i++;
+
+	}
+
+	return Xi1;
+
+}
+
+void buscarTIRPuntoFijo (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	//TODO semilla
+	double raiz = puntoFijo(inversion, arrayFCF, 0.0427171 + 0.0000000001);
+
+	if (raiz != FRACASO) {
+
+		printf("Raiz por punto fijo: ");
+
+		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
+
+	}
 
 }
 
@@ -428,6 +490,7 @@ void imprimirEnunciado (short enunciado) {
 
 int proceso () {
 
+	double raizBiseccion;
 	struct vectorDatos datos = cargarDatos();
 
 	double matriz [5][N+1];
@@ -437,10 +500,10 @@ int proceso () {
 	imprimirTabla(matriz);
 
 	imprimirEnunciado(2);
-	buscarTIRBiseccion(matriz[0][0], matriz[4]);
+	raizBiseccion = buscarTIRBiseccion(/* Inversión */matriz[0][0], /* FCF */matriz[4]);
 
 	imprimirEnunciado(3);
-	//buscarTIRPuntoFijo();
+	buscarTIRPuntoFijo(raizBiseccion, /* Inversión */matriz[0][0], /* FCF */matriz[4]);
 	/*buscarTIRSecante();
 	buscarTIREscenarios();*/
 

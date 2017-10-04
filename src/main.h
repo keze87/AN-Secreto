@@ -5,16 +5,14 @@
 #define TRUE 0
 #define FALSE 1
 
+#define MAXITERACIONES 32000
+#define FRACASO -32000
+
 #define N 20
 #define MESES 12
 #define HORASPORANIO 8760
 #define FACTORREDUCCIONPOTENCIA 0.3
 #define DOLARAPESO 17.5
-
-#define MAXITERACIONES 32000
-//TODO
-#define MAXERROR 0.00000000005
-#define FRACASO -32000
 
 struct vectorDatos {
 
