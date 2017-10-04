@@ -19,8 +19,6 @@
 #define DOLARAPESO 17.5
 
 #define MAXITERACIONES 32000
-//TODO
-#define MAXERROR 0.00000000005
 #define FRACASO -32000
 
 struct vectorDatos {
@@ -339,16 +337,23 @@ double van (double i, int inversion, double arrayFCF[N+1]) {
 
 }
 
+double error (double Xk1, double Xk) {
+
+	return fabs(Xk1 - Xk) / fabs(Xk1) * 100;
+
+}
+
 double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
 
 	int i = 1;
 
-	double puntoMedio;
+	double puntoMedio = intervaloMin;
+	double puntoMedioAnterior;
 
 	if ( ! ((intervaloMin < intervaloMax) && \
 			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
 
-			printf("No se puede resolver por biseccion.\n");
+			printf("No se puede resolver por bisección.\n");
 
 			return FRACASO;
 
@@ -356,11 +361,12 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 	while (i < MAXITERACIONES) {
 
+		puntoMedioAnterior = puntoMedio;
 		puntoMedio = (intervaloMin + intervaloMax) / 2;
 
-		if ((van(puntoMedio, inversion, arrayFCF) == 0) || ((intervaloMax - intervaloMin) / 2) < MAXERROR) {
+		if ((van(puntoMedio, inversion, arrayFCF) == 0) || (error(puntoMedio, puntoMedioAnterior) < 1 /* % */)) {
 
-			break; // Encontre solucion
+			break; // Encontre solución
 
 		}
 
@@ -384,8 +390,39 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 void buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
 
+	printf("Raiz por biseccion: ");
+
 	// Busco en un intervalo [0.02, 0.06]
-	printf("%F\n", biseccion(inversion, arrayFCF, 0.02, 0.06));
+	//TODO error
+	printf("%s +/- 0.01\n", redondear(biseccion(inversion, arrayFCF, 0.02, 0.06)));
+
+}
+
+void imprimirEnunciado (short enunciado) {
+
+	switch (enunciado) {
+
+		case 1:
+			printf("\n1) Calcular la inversión requerida, los ahorros y el resultado del flujo de fondos para cada año.\n");
+			printf("   Mostrar los valores en una tabla:\n\n");
+			break;
+
+		case 2:
+			printf("\n2) Aplicar el método de bisección para calcular la TIR del proyecto.\n");
+			printf("   Para ello, encuentre un intervalo que contenga a la raíz buscada e itere hasta lograr una precisión de 1%%.\n");
+			printf("   Exprese el resultado correctamente.\n\n");
+			break;
+
+		case 3:
+			printf("\n3) Aplicar el método de punto fijo para calcular la TIR del proyecto utilizando la función de iteración g(x) = x - f(x).\n");
+			printf("   Para ello, utilice como semilla, un valor similar al encontrado mediante bisección.\n");
+			printf("   Exprese el resultado correctamente.\n\n");
+			break;
+
+		default :
+			printf("Error\n");
+
+	}
 
 }
 
@@ -396,15 +433,15 @@ int proceso () {
 	double matriz [5][N+1];
 	cargarMatriz(matriz,datos);
 
-	//TODO
-	//imprimirEnunciado(1);
+	imprimirEnunciado(1);
 	imprimirTabla(matriz);
 
-	//imprimirEnunciado(2);
+	imprimirEnunciado(2);
 	buscarTIRBiseccion(matriz[0][0], matriz[4]);
 
-	/*buscarTIRPuntoFijo();
-	buscarTIRSecante();
+	imprimirEnunciado(3);
+	//buscarTIRPuntoFijo();
+	/*buscarTIRSecante();
 	buscarTIREscenarios();*/
 
 	return TRUE;

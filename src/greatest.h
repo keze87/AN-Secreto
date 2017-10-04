@@ -1131,7 +1131,7 @@ printf("\033[32m" "\nCorriendo pruebas unitarias:\n\n" "\x1b[0m");/*nerfed*/\
         } else {                                                        \
                  printf("\x1b[31m");                                    \
         }                                                               \
-        printf("\nFin pruebas.\n\n" "\x1b[0m");          /*nerfed*/     \
+        printf("\nFin pruebas.\n" "\x1b[0m");          /*nerfed*/       \
         return (greatest_all_passed() ? EXIT_SUCCESS : EXIT_FAILURE);   \
     } while (0)
 
