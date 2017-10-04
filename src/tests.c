@@ -86,11 +86,9 @@ TEST testIntervaloBiseccion (void) {
 	for (int i = 0; i < N+1; i++)
 		arrayFCF[i] = 71218;
 
-	char * aux = biseccion(-945000, arrayFCF, 1, 2);
-	GREATEST_ASSERT_STR_EQ("No se puede resolver por biseccion.", aux); free(aux);
+	GREATEST_ASSERT_EQ(FRACASO, biseccion(-945000, arrayFCF, 1, 2));
 
-	aux = biseccion(-945000, arrayFCF, 0, 2);
-	GREATEST_ASSERT_STR_EQ("0.05", aux); free(aux);
+	GREATEST_ASSERT_IN_RANGE(0.0427171, biseccion(-945000, arrayFCF, 0, 2), 0.01);
 
 	PASS();
 

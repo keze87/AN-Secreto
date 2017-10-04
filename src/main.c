@@ -21,6 +21,7 @@
 #define MAXITERACIONES 32000
 //TODO
 #define MAXERROR 0.00000000005
+#define FRACASO -32000
 
 struct vectorDatos {
 
@@ -307,7 +308,7 @@ double potencia (double x, int n) {
 
 	double aux = 1;
 
-	for (int i = 1; i <= n; i++) {
+	for (int i = 1; i < n; i++) {
 
 		aux = aux * x;
 
@@ -321,9 +322,9 @@ double sumatoriaVan (double arrayFCF[N+1], double x) {
 
 	double aux = 0;
 
-	for (int i = 0; i < N + 1; i++) {
+	for (int i = 1; i <= N; i++) {
 
-		aux = aux + arrayFCF[i] / potencia(1 + x, i);
+		aux = aux + arrayFCF[i - 1] / potencia(1 + x, i);
 
 	}
 
@@ -331,26 +332,25 @@ double sumatoriaVan (double arrayFCF[N+1], double x) {
 
 }
 
+// Io+Sum[FCF/(i+1)^n, {n, 20}]
 double van (double i, int inversion, double arrayFCF[N+1]) {
 
 	return inversion + sumatoriaVan(arrayFCF,i);
 
 }
 
-char * biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
+double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
 
 	int i = 1;
 
 	double puntoMedio;
 
-	char * aux = malloc(sizeof(char) * 40);
-
 	if ( ! ((intervaloMin < intervaloMax) && \
 			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
 
-			strcpy(aux, "No se puede resolver por biseccion.");
+			printf("No se puede resolver por biseccion.\n");
 
-			return aux;
+			return FRACASO;
 
 	}
 
@@ -378,16 +378,14 @@ char * biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 	}
 
-	strcpy(aux, redondear(puntoMedio));
-
-	return aux;
+	return puntoMedio;
 
 }
 
 void buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
 
 	// Busco en un intervalo [0.02, 0.06]
-	printf("%s\n", biseccion(inversion, arrayFCF, 0.02, 0.06));
+	printf("%F\n", biseccion(inversion, arrayFCF, 0.02, 0.06));
 
 }
 

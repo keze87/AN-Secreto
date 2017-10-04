@@ -14,6 +14,7 @@
 #define MAXITERACIONES 32000
 //TODO
 #define MAXERROR 0.00000000005
+#define FRACASO -32000
 
 struct vectorDatos {
 
@@ -37,4 +38,4 @@ double ahorroPotencia (int potencia, int costoPot);
 double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float ganancias);
 struct vectorDatos cargarDatos ();
 char * redondear (double numero);
-char * biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax);
+double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax);
