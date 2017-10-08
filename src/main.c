@@ -16,6 +16,9 @@
 #define FRACASO -300000
 
 #define N 20
+#define h 0.000001
+#define MINDIVISOR 0.0000000001
+#define TAMMATRIZ 6
 #define MESES 12
 #define HORASPORANIO 8760
 #define FACTORREDUCCIONPOTENCIA 0.3
@@ -130,7 +133,7 @@ char * redondear (double numero) {
 }
 
 // Llena una matriz con los titulos y los números redondeados
-void cargarMatrizRedondada (char * matriz[6][6], double matrizDatos[5][N+1]) {
+void cargarMatrizRedondada (char * matriz[TAMMATRIZ][TAMMATRIZ], double matrizDatos[5][N+1]) {
 
 	// Pido memoria para los titulos
 	matriz[0][0] = malloc(sizeof(char) * 2);
@@ -144,7 +147,7 @@ void cargarMatrizRedondada (char * matriz[6][6], double matrizDatos[5][N+1]) {
 	}
 
 	// Escribo los titulos
-	strcpy(matriz[0][0], " "); strcpy(matriz[0][1], "Anio 0"); strcpy(matriz[0][2], "Anio 1"); \
+	strcpy(matriz[0][0], " "); strcpy(matriz[0][1], "Anio 0"); strcpy(matriz[0][2], "Anio 1");
 					strcpy(matriz[0][3], "Anio 2"); strcpy(matriz[0][4], "..."); strcpy(matriz[0][5], "Anio N");
 	strcpy(matriz[1][0], "Inversion");				strcpy(matriz[1][4], "...");
 	strcpy(matriz[2][0], "Ahorro electricidad");	strcpy(matriz[2][4], "...");
@@ -190,23 +193,23 @@ void cargarMatrizRedondada (char * matriz[6][6], double matrizDatos[5][N+1]) {
 
 }
 
-void liberarMemoriaMatriz (char * matriz[6][6]) {
+void liberarMemoriaMatriz (char * matriz[TAMMATRIZ][TAMMATRIZ]) {
 
-	for (int i = 0; i <= 5; i++)
-		for (int j = 0; j <= 5; j++)
+	for (int i = 0; i < TAMMATRIZ; i++)
+		for (int j = 0; j < TAMMATRIZ; j++)
 			free(matriz[i][j]);
 
 }
 
 // Busca el largo del elemento mas largo de cada columna
-void calcularAnchoColumnas (int anchos[6], char * matriz[6][6]) {
+void calcularAnchoColumnas (int anchos[TAMMATRIZ], char * matriz[TAMMATRIZ][TAMMATRIZ]) {
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < TAMMATRIZ; i++)
 		anchos[i] = 0;
 
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < TAMMATRIZ; i++) {
 
-		for (int j = 0; j < 6; j++) {
+		for (int j = 0; j < TAMMATRIZ; j++) {
 
 			if (strlen(matriz[j][i]) > anchos[i])
 				anchos[i] = strlen(matriz[j][i]);
@@ -218,20 +221,20 @@ void calcularAnchoColumnas (int anchos[6], char * matriz[6][6]) {
 }
 
 // Imprime linea entre filas
-void imprimirLineaSeparadora (int anchos[6]) {
+void imprimirLineaSeparadora (int anchos[TAMMATRIZ]) {
 
 	int i = 0;
 
 	int anchoTotal = 0;
 
-	for (int j = 0; j < 6; j++)
+	for (int j = 0; j < TAMMATRIZ; j++)
 		anchoTotal = anchoTotal + anchos[j];
 
 	anchoTotal = anchoTotal + 5 * 3; // Tamaño separador
 
 	printf("\n");
 
-	while (i < anchoTotal) {
+	while (i <= anchoTotal) {
 
 		printf("-");
 
@@ -261,24 +264,24 @@ void imprimirSeparador (int anchoElemento, int anchoFila) {
 }
 
 // Imprime matriz de Strings agregando separadores
-void imprimirMatriz (char * matriz[6][6]) {
+void imprimirMatriz (char * matriz[TAMMATRIZ][TAMMATRIZ]) {
 
 	int anchos [6];
 
 	calcularAnchoColumnas(anchos, matriz);
 
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < TAMMATRIZ; i++) {
 
-		for (int j = 0; j < 6; j++) {
+		for (int j = 0; j < TAMMATRIZ; j++) {
 
 			printf("%s", matriz[i][j]);
 
-			if (j != 5)
+			if (j != TAMMATRIZ - 1)
 				imprimirSeparador(strlen(matriz[i][j]), anchos[j]);
 
 		}
 
-		if (i != 5)
+		if (i != TAMMATRIZ - 1)
 			imprimirLineaSeparadora(anchos);
 
 	}
@@ -290,7 +293,7 @@ void imprimirMatriz (char * matriz[6][6]) {
 // Calcula datos y manda a imprimir
 int imprimirTabla (double matriz[5][N+1]) {
 
-	char * matrizRedondeada [6][6];
+	char * matrizRedondeada [TAMMATRIZ][TAMMATRIZ];
 
 	cargarMatrizRedondada(matrizRedondeada,matriz);
 
@@ -333,8 +336,10 @@ double sumatoriaVan (double x) {
 // Io+Sum[FCF/(i+1)^n, {n, 20}]
 double van (double i, int inversion, double arrayFCF[N+1]) {
 
-	// FCF No cambia con respecto al año
-	return inversion + arrayFCF[0] * sumatoriaVan(i);
+	if (i != -1)
+		return inversion + arrayFCF[0] * sumatoriaVan(i); // FCF No cambia con respecto al año
+
+	return FRACASO;
 
 }
 
@@ -389,7 +394,7 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 }
 
-void imprimirRaiz(double raiz, char * metodo) {
+void imprimirRaiz (double raiz, char * metodo) {
 
 	if (raiz != FRACASO) {
 
@@ -403,7 +408,7 @@ void imprimirRaiz(double raiz, char * metodo) {
 
 }
 
-double buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
+double buscarTIRBiseccion (int inversion, double arrayFCF[N+1]) {
 
 	// Busco en un intervalo [0.02, 0.06]
 	double raiz = biseccion(inversion, arrayFCF, 0.02, 0.06);
@@ -411,6 +416,15 @@ double buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
 	imprimirRaiz(raiz, "biseccion");
 
 	return raiz;
+
+}
+
+double vanDerivada (double i, int inversion, double arrayFCF[N+1]) {
+
+	if (i != -1)
+		return (van(i + h, inversion, arrayFCF) - van(i, inversion, arrayFCF)) / h;
+
+	return FRACASO;
 
 }
 
@@ -424,11 +438,17 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 	while (i < MAXITERACIONES) {
 
+		double resultadoDerivada = vanDerivada(Xi, inversion, arrayFCF);
+
+		if (fabs(resultadoDerivada) < MINDIVISOR) {
+
+			break; // Salgo por divisor chico
+
+		}
+
 		fXi = van(Xi, inversion, arrayFCF);
 
-		//printf("%F\n",fXi);
-
-		Xi1 = Xi - fXi;
+		Xi1 = Xi - fXi / resultadoDerivada;
 
 		errorPF = fabs(Xi1 - Xi);
 
@@ -516,7 +536,7 @@ double secante (int inversion, double arrayFCF[N+1], double min, double max) {
 void buscarTIRSecante (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	//TODO semilla
-	double raiz = secante(inversion, arrayFCF, 0.042, 0.05);
+	double raiz = secante(inversion, arrayFCF, raizBiseccion - 0.001, 0.05);
 
 	imprimirRaiz(raiz, "secante");
 

@@ -84,11 +84,26 @@ TEST testIntervaloBiseccion (void) {
 	// Cargo array con FCF
 	double arrayFCF[N+1];
 	for (int i = 0; i < N+1; i++)
-		arrayFCF[i] = 71218;
+		arrayFCF[i] = 71218.447161;
 
 	GREATEST_ASSERT_EQ(FRACASO, biseccion(-945000, arrayFCF, 1, 2));
 
 	GREATEST_ASSERT_IN_RANGE(0.04271, biseccion(-945000, arrayFCF, 0, 2), 0.006); // 0.0480957
+
+	PASS();
+
+}
+
+TEST testDerivadaVAN (void) {
+
+	// Cargo array con FCF
+	double arrayFCF[N+1];
+	for (int i = 0; i < N+1; i++)
+		arrayFCF[i] = 71218.447161;
+
+	GREATEST_ASSERT_EQ_FMT((long) FRACASO, (long) vanDerivada(-1, -945000, arrayFCF), "%li");
+	GREATEST_ASSERT_EQ_FMT((long) -8570524, (long) vanDerivada(0.045, -945000, arrayFCF), "%li");
+	GREATEST_ASSERT_EQ_FMT((long) -7721529, (long) vanDerivada(0.048, -945000, arrayFCF), "%li");
 
 	PASS();
 
@@ -105,6 +120,7 @@ int correrTests () {
 	RUN_TEST(testCargarDatos);
 	RUN_TEST(testRedondeoNumero);
 	RUN_TEST(testIntervaloBiseccion);
+	RUN_TEST(testDerivadaVAN);
 
 	GREATEST_MAIN_END();
 

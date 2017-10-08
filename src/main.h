@@ -9,6 +9,9 @@
 #define FRACASO -300000
 
 #define N 20
+#define h 0.000001
+#define MINDIVISOR 0.0000000001
+#define TAMMATRIZ 6
 #define MESES 12
 #define HORASPORANIO 8760
 #define FACTORREDUCCIONPOTENCIA 0.3
@@ -37,3 +40,4 @@ double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float 
 struct vectorDatos cargarDatos ();
 char * redondear (double numero);
 double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax);
+double vanDerivada (double i, int inversion, double arrayFCF[N+1]);
