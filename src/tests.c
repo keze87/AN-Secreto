@@ -88,7 +88,7 @@ TEST testIntervaloBiseccion (void) {
 
 	GREATEST_ASSERT_EQ(FRACASO, biseccion(-945000, arrayFCF, 1, 2));
 
-	GREATEST_ASSERT_IN_RANGE(0.0427171, biseccion(-945000, arrayFCF, 0, 2), 0.01);
+	GREATEST_ASSERT_IN_RANGE(0.042717838450210, biseccion(-945000, arrayFCF, 0, 2), 0.001);
 
 	PASS();
 

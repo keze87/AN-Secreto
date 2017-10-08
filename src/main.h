@@ -6,7 +6,7 @@
 #define FALSE 1
 
 #define MAXITERACIONES 32000
-#define FRACASO -32000
+#define FRACASO -300000
 
 #define N 20
 #define MESES 12

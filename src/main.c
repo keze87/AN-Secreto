@@ -13,7 +13,7 @@
 #define FALSE 1
 
 #define MAXITERACIONES 32000
-#define FRACASO -32000
+#define FRACASO -300000
 
 #define N 20
 #define MESES 12
@@ -316,13 +316,13 @@ double potencia (double x, int n) {
 
 }
 
-double sumatoriaVan (double arrayFCF[N+1], double x) {
+double sumatoriaVan (double x) {
 
 	double aux = 0;
 
 	for (int i = 1; i <= N; i++) {
 
-		aux = aux + arrayFCF[i - 1] / potencia(1 + x, i);
+		aux = aux + 1 / potencia(1 + x, i);
 
 	}
 
@@ -333,7 +333,8 @@ double sumatoriaVan (double arrayFCF[N+1], double x) {
 // Io+Sum[FCF/(i+1)^n, {n, 20}]
 double van (double i, int inversion, double arrayFCF[N+1]) {
 
-	return inversion + sumatoriaVan(arrayFCF,i);
+	// FCF No cambia con respecto al año
+	return inversion + arrayFCF[0] * sumatoriaVan(i);
 
 }
 
@@ -417,7 +418,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		fXi = van (Xi, inversion, arrayFCF);
 
-		printf("%F\n",fXi);
+		//printf("%F\n",fXi);
 
 		Xi1 = Xi - fXi;
 
@@ -448,11 +449,76 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 void buscarTIRPuntoFijo (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	//TODO semilla
-	double raiz = puntoFijo(inversion, arrayFCF, 0.0427171 + 0.0000000001);
+	double raiz = puntoFijo(inversion, arrayFCF, 0.0427171);
 
 	if (raiz != FRACASO) {
 
 		printf("Raiz por punto fijo: ");
+
+		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
+
+	}
+
+}
+
+double secante (int inversion, double arrayFCF[N+1], double min, double max) {
+
+	int i = 1;
+	double XiMas1;
+	double Xi = max;
+	double XiMenos1 = min;
+
+	double fXi;
+	double fXiMenos1;
+	double errorPF;
+
+	while (i < MAXITERACIONES) {
+
+		fXi = van (Xi, inversion, arrayFCF);
+		fXiMenos1 = van (XiMenos1, inversion, arrayFCF);
+
+		XiMas1 = Xi - (Xi - XiMenos1) * fXi / (fXi - fXiMenos1);
+
+		errorPF = fabs(XiMas1 - XiMenos1);
+
+		if (errorPF > 1) {
+
+			printf("No se puede resolver por puntoFijo.\n");
+
+			return FRACASO;
+
+		} else if (errorPF < 0.00005) {
+
+			break;
+
+		}
+
+		if (fabs(XiMas1 - XiMenos1) < fabs(Xi - XiMas1)) {
+
+			XiMenos1 = XiMas1;
+
+		} else {
+
+			Xi = XiMas1;
+
+		}
+
+		i++;
+
+	}
+
+	return XiMas1;
+
+}
+
+void buscarTIRSecante (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	//TODO semilla
+	double raiz = secante(inversion, arrayFCF, 0.042, 0.05);
+
+	if (raiz != FRACASO) {
+
+		printf("Raiz por secante: ");
 
 		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
 
@@ -481,6 +547,10 @@ void imprimirEnunciado (short enunciado) {
 			printf("   Exprese el resultado correctamente.\n\n");
 			break;
 
+		case 4:
+			printf("\n5) Repita el punto 3) aplicando el método de la secante.\n\n");
+			break;
+
 		default :
 			printf("Error\n");
 
@@ -504,8 +574,10 @@ int proceso () {
 
 	imprimirEnunciado(3);
 	buscarTIRPuntoFijo(raizBiseccion, /* Inversión */matriz[0][0], /* FCF */matriz[4]);
-	/*buscarTIRSecante();
-	buscarTIREscenarios();*/
+
+	imprimirEnunciado(4);
+	buscarTIRSecante(raizBiseccion, /* Inversión */matriz[0][0], /* FCF */matriz[4]);
+	//buscarTIREscenarios();
 
 	return TRUE;
 
