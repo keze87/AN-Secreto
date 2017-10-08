@@ -389,18 +389,26 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 }
 
+void imprimirRaiz(double raiz, char * metodo) {
+
+	if (raiz != FRACASO) {
+
+		printf("Raiz por %s: ", metodo);
+
+		char * aux = redondear(raiz);
+		printf("%s +/- 0.01\n", aux); //TODO error
+		free(aux);
+
+	}
+
+}
+
 double buscarTIRBiseccion(int inversion, double arrayFCF[N+1]) {
 
 	// Busco en un intervalo [0.02, 0.06]
 	double raiz = biseccion(inversion, arrayFCF, 0.02, 0.06);
 
-	if (raiz != FRACASO) {
-
-		printf("Raiz por biseccion: ");
-
-		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
-
-	}
+	imprimirRaiz(raiz, "biseccion");
 
 	return raiz;
 
@@ -416,7 +424,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 	while (i < MAXITERACIONES) {
 
-		fXi = van (Xi, inversion, arrayFCF);
+		fXi = van(Xi, inversion, arrayFCF);
 
 		//printf("%F\n",fXi);
 
@@ -449,15 +457,9 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 void buscarTIRPuntoFijo (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	//TODO semilla
-	double raiz = puntoFijo(inversion, arrayFCF, 0.0427171);
+	double raiz = puntoFijo(inversion, arrayFCF, raizBiseccion);
 
-	if (raiz != FRACASO) {
-
-		printf("Raiz por punto fijo: ");
-
-		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
-
-	}
+	imprimirRaiz(raiz, "punto fijo");
 
 }
 
@@ -516,13 +518,11 @@ void buscarTIRSecante (double raizBiseccion, int inversion, double arrayFCF[N+1]
 	//TODO semilla
 	double raiz = secante(inversion, arrayFCF, 0.042, 0.05);
 
-	if (raiz != FRACASO) {
+	imprimirRaiz(raiz, "secante");
 
-		printf("Raiz por secante: ");
+}
 
-		printf("%s +/- 0.01\n", redondear(raiz)); //TODO error
-
-	}
+void buscarTIREscenarios (int inversion, double arrayFCF[N+1]) {
 
 }
 
@@ -551,6 +551,15 @@ void imprimirEnunciado (short enunciado) {
 			printf("\n5) Repita el punto 3) aplicando el método de la secante.\n\n");
 			break;
 
+		case 5:
+			printf("\n7) Calcule la TIR del proyecto utilizando el método de la secante para los siguientes escenarios:\n");
+			printf("   a) El costo unitario de la instalación fotovoltaica se reduce un 30%%.\n");
+			printf("   b) Los proyectos solares quedan exentos del pago del impuesto a las ganancias (α=0).\n");
+			printf("   c) El costo de la electricidad se duplica.\n");
+			printf("   d) La constante del Factor de Uso aumenta a 0,2 (mejora la eficiencia de los paneles)\n");
+			printf("   e) Los proyectos solares quedan exentos del pago del impuesto a las ganancias por los primeros 5 años.\n\n");
+			break;
+
 		default :
 			printf("Error\n");
 
@@ -577,7 +586,9 @@ int proceso () {
 
 	imprimirEnunciado(4);
 	buscarTIRSecante(raizBiseccion, /* Inversión */matriz[0][0], /* FCF */matriz[4]);
-	//buscarTIREscenarios();
+
+	imprimirEnunciado(5);
+	buscarTIREscenarios(/* Inversión */matriz[0][0], /* FCF */matriz[4]);
 
 	return TRUE;
 
