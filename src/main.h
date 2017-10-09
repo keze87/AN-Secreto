@@ -25,7 +25,7 @@ struct vectorDatos {
 
 	// FCFn
 	int costos;
-	float ganancias;
+	float ganancias[N+1];
 
 	// Ahorros
 	double factorUso;

@@ -32,7 +32,7 @@ struct vectorDatos {
 
 	// FCFn
 	int costos;
-	float ganancias;
+	float ganancias[N+1];
 
 	// Ahorros
 	double factorUso;
@@ -55,7 +55,7 @@ double ahorroPotencia (int potencia, int costoPot) {
 
 double fcf (double ahorroElectricidad, double ahorroPotencia, int costos, float ganancias) {
 
-	return (ahorroElectricidad + ahorroPotencia - costos) * (1 - ganancias) ;
+	return (ahorroElectricidad + ahorroPotencia - costos) * (1 - ganancias);
 
 }
 
@@ -66,10 +66,15 @@ struct vectorDatos cargarDatos () {
 	aux.potencia				= 30;
 	aux.costoUnitarioPotencia	= 1800;
 	aux.costos					= 5000;
-	aux.ganancias				= 0.35;
 	aux.factorUso				= 0.18 * NUMERODEPADRON / 100000;
 	aux.costoElec				= 1.9;
 	aux.costoPot				= 250;
+
+	for (int i = 0; i <= N; i++) {
+
+		aux.ganancias[i] = 0.35;
+
+	}
 
 	return aux;
 
@@ -93,7 +98,7 @@ void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 		matriz[3][i] = datos.costos;
 
-		matriz[4][i] = fcf(matriz[1][i], matriz[2][i], matriz[3][i], datos.ganancias);
+		matriz[4][i] = fcf(matriz[1][i], matriz[2][i], matriz[3][i], datos.ganancias[i]);
 
 	}
 
@@ -319,13 +324,13 @@ double potencia (double x, int n) {
 
 }
 
-double sumatoriaVan (double x) {
+double sumatoriaVan (double x, double arrayFCF[N+1]) {
 
 	double aux = 0;
 
 	for (int i = 1; i <= N; i++) {
 
-		aux = aux + 1 / potencia(1 + x, i);
+		aux = aux + arrayFCF[i] / potencia(1 + x, i);
 
 	}
 
@@ -334,10 +339,10 @@ double sumatoriaVan (double x) {
 }
 
 // Io+Sum[FCF/(i+1)^n, {n, 20}]
-double van (double i, int inversion, double FCF) {
+double van (double i, int inversion, double arrayFCF[N+1]) {
 
 	if (i != -1)
-		return inversion + FCF * sumatoriaVan(i); // FCF No cambia con respecto al año
+		return inversion + sumatoriaVan(i, arrayFCF);
 
 	return FRACASO;
 
@@ -356,10 +361,8 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 	double puntoMedio = intervaloMin;
 	double puntoMedioAnterior;
 
-	double FCF = arrayFCF[0];
-
 	if ( ! ((intervaloMin < intervaloMax) && \
-			(van(intervaloMin, inversion, FCF) * van(intervaloMax, inversion, FCF) < 0))) {
+			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
 
 			printf("No se puede resolver por bisección.\n");
 
@@ -372,13 +375,13 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 		puntoMedioAnterior = puntoMedio;
 		puntoMedio = (intervaloMin + intervaloMax) / 2;
 
-		if ((van(puntoMedio, inversion, FCF) == 0) || (error(puntoMedio, puntoMedioAnterior) < 1 /* % */)) {
+		if ((van(puntoMedio, inversion, arrayFCF) == 0) || (error(puntoMedio, puntoMedioAnterior) < 1 /* % */)) {
 
 			break; // Encontre solución
 
 		}
 
-		if (van(intervaloMin, inversion, FCF) * van(puntoMedio, inversion, FCF) < 0) {
+		if (van(intervaloMin, inversion, arrayFCF) * van(puntoMedio, inversion, arrayFCF) < 0) {
 
 			intervaloMax = puntoMedio;
 
@@ -397,6 +400,8 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 }
 
 void imprimirRaiz (double raiz, char * metodo) {
+
+	//printf("%.16F\n", raiz);
 
 	if (raiz != FRACASO) {
 
@@ -423,10 +428,8 @@ double buscarTIRBiseccion (int inversion, double arrayFCF[N+1]) {
 
 double vanDerivada (double i, int inversion, double arrayFCF[N+1]) {
 
-	double FCF = arrayFCF[0];
-
 	if (i != -1)
-		return (van(i + h, inversion, FCF) - van(i, inversion, FCF)) / h;
+		return (van(i + h, inversion, arrayFCF) - van(i, inversion, arrayFCF)) / h;
 
 	return FRACASO;
 
@@ -438,8 +441,6 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 	double Xi1;
 	double Xi = semilla;
 	double fXi;
-
-	double FCF = arrayFCF[0];
 
 	while (i < MAXITERACIONES) {
 
@@ -453,7 +454,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		}
 
-		fXi = van(Xi, inversion, FCF);
+		fXi = van(Xi, inversion, arrayFCF);
 
 		Xi1 = Xi - fXi / resultadoDerivada;
 
@@ -481,7 +482,6 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 void buscarTIRPuntoFijo (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
-	//TODO semilla
 	double raiz = puntoFijo(inversion, arrayFCF, raizBiseccion - 0.1);
 
 	imprimirRaiz(raiz, "punto fijo");
@@ -498,12 +498,10 @@ double secante (int inversion, double arrayFCF[N+1], double min, double max) {
 	double fXi;
 	double fXiMenos1;
 
-	double FCF = arrayFCF[0];
-
 	while (i < MAXITERACIONES) {
 
-		fXi = van(Xi, inversion, FCF);
-		fXiMenos1 = van(XiMenos1, inversion, FCF);
+		fXi = van(Xi, inversion, arrayFCF);
+		fXiMenos1 = van(XiMenos1, inversion, arrayFCF);
 
 		XiMas1 = Xi - (Xi - XiMenos1) * fXi / (fXi - fXiMenos1);
 
@@ -539,14 +537,13 @@ double secante (int inversion, double arrayFCF[N+1], double min, double max) {
 
 void buscarTIRSecante (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
-	//TODO semilla
 	double raiz = secante(inversion, arrayFCF, raizBiseccion - 0.1, raizBiseccion + 0.1);
 
 	imprimirRaiz(raiz, "secante");
 
 }
 
-void buscarTIREscenarios (int inversion, double arrayFCF[N+1]) {
+void buscarTIREscenarios () {
 
 	double matriz [5][N+1];
 	struct vectorDatos datos = cargarDatos();
@@ -556,15 +553,17 @@ void buscarTIREscenarios (int inversion, double arrayFCF[N+1]) {
 	cargarMatriz(matriz,datos);
 
 	printf("a)\n");
-	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0.08, 0.11), "biseccion"); // 0.08757777
+	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0.08, 0.11), "biseccion"); // 0.08757777
 
 	// b)
 	datos = cargarDatos();
-	datos.ganancias = 0;
+	for (int i = 0; i <= N; i++)
+		datos.ganancias[i] = 0;
+
 	cargarMatriz(matriz,datos);
 
 	printf("b)\n");
-	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0, 0.11), "biseccion");
+	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 0.13), "biseccion");
 
 	// c)
 	datos = cargarDatos();
@@ -572,7 +571,7 @@ void buscarTIREscenarios (int inversion, double arrayFCF[N+1]) {
 	cargarMatriz(matriz,datos);
 
 	printf("c)\n");
-	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0, 0.11), "biseccion");
+	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 0.2), "biseccion");
 
 	// d)
 	datos = cargarDatos();
@@ -580,7 +579,20 @@ void buscarTIREscenarios (int inversion, double arrayFCF[N+1]) {
 	cargarMatriz(matriz,datos);
 
 	printf("d)\n");
-	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0, 0.11), "biseccion");
+	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 0.11), "biseccion");
+
+	// e)
+	datos = cargarDatos();
+
+	if (N > 5)
+		for (int i = 0; i <= 5; i++)
+			datos.ganancias[i] = 0;
+
+	cargarMatriz(matriz,datos);
+
+	printf("e)\n");
+	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 1), "biseccion");
+
 
 }
 
@@ -646,7 +658,7 @@ int proceso () {
 	buscarTIRSecante(raizBiseccion, /* Inversión */matriz[0][0], /* FCF */matriz[4]);
 
 	imprimirEnunciado(5);
-	buscarTIREscenarios(/* Inversión */matriz[0][0], /* FCF */matriz[4]);
+	buscarTIREscenarios();
 
 	return TRUE;
 
