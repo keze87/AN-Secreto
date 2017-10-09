@@ -28,7 +28,7 @@ struct vectorDatos {
 
 	// Inversion inicial
 	int potencia;
-	int costoUnitarioPotencia;
+	double costoUnitarioPotencia;
 
 	// FCFn
 	int costos;
@@ -93,7 +93,7 @@ void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 		matriz[3][i] = datos.costos;
 
-		matriz[4][i] = fcf (matriz[1][i], matriz[2][i], matriz[3][i], datos.ganancias);
+		matriz[4][i] = fcf(matriz[1][i], matriz[2][i], matriz[3][i], datos.ganancias);
 
 	}
 
@@ -334,10 +334,10 @@ double sumatoriaVan (double x) {
 }
 
 // Io+Sum[FCF/(i+1)^n, {n, 20}]
-double van (double i, int inversion, double arrayFCF[N+1]) {
+double van (double i, int inversion, double FCF) {
 
 	if (i != -1)
-		return inversion + arrayFCF[0] * sumatoriaVan(i); // FCF No cambia con respecto al año
+		return inversion + FCF * sumatoriaVan(i); // FCF No cambia con respecto al año
 
 	return FRACASO;
 
@@ -356,8 +356,10 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 	double puntoMedio = intervaloMin;
 	double puntoMedioAnterior;
 
+	double FCF = arrayFCF[0];
+
 	if ( ! ((intervaloMin < intervaloMax) && \
-			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
+			(van(intervaloMin, inversion, FCF) * van(intervaloMax, inversion, FCF) < 0))) {
 
 			printf("No se puede resolver por bisección.\n");
 
@@ -370,13 +372,13 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 		puntoMedioAnterior = puntoMedio;
 		puntoMedio = (intervaloMin + intervaloMax) / 2;
 
-		if ((van(puntoMedio, inversion, arrayFCF) == 0) || (error(puntoMedio, puntoMedioAnterior) < 1 /* % */)) {
+		if ((van(puntoMedio, inversion, FCF) == 0) || (error(puntoMedio, puntoMedioAnterior) < 1 /* % */)) {
 
 			break; // Encontre solución
 
 		}
 
-		if (van(intervaloMin, inversion, arrayFCF) * van(puntoMedio, inversion, arrayFCF) < 0) {
+		if (van(intervaloMin, inversion, FCF) * van(puntoMedio, inversion, FCF) < 0) {
 
 			intervaloMax = puntoMedio;
 
@@ -421,8 +423,10 @@ double buscarTIRBiseccion (int inversion, double arrayFCF[N+1]) {
 
 double vanDerivada (double i, int inversion, double arrayFCF[N+1]) {
 
+	double FCF = arrayFCF[0];
+
 	if (i != -1)
-		return (van(i + h, inversion, arrayFCF) - van(i, inversion, arrayFCF)) / h;
+		return (van(i + h, inversion, FCF) - van(i, inversion, FCF)) / h;
 
 	return FRACASO;
 
@@ -434,7 +438,8 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 	double Xi1;
 	double Xi = semilla;
 	double fXi;
-	double errorPF;
+
+	double FCF = arrayFCF[0];
 
 	while (i < MAXITERACIONES) {
 
@@ -442,23 +447,23 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		if (fabs(resultadoDerivada) < MINDIVISOR) {
 
-			break; // Salgo por divisor chico
-
-		}
-
-		fXi = van(Xi, inversion, arrayFCF);
-
-		Xi1 = Xi - fXi / resultadoDerivada;
-
-		errorPF = fabs(Xi1 - Xi);
-
-		if (errorPF > 1) {
-
-			printf("No se puede resolver por puntoFijo.\n");
+			printf("No se puede resolver por punto fijo.\n");
 
 			return FRACASO;
 
-		} else if (errorPF < 0.00005) {
+		}
+
+		fXi = van(Xi, inversion, FCF);
+
+		Xi1 = Xi - fXi / resultadoDerivada;
+
+		if (fabs(Xi1 - Xi) > 1) {
+
+			printf("No se puede resolver por punto fijo.\n");
+
+			return FRACASO;
+
+		} else if (error(Xi1, Xi) < 1) {
 
 			break;
 
@@ -477,7 +482,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 void buscarTIRPuntoFijo (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	//TODO semilla
-	double raiz = puntoFijo(inversion, arrayFCF, raizBiseccion);
+	double raiz = puntoFijo(inversion, arrayFCF, raizBiseccion - 0.1);
 
 	imprimirRaiz(raiz, "punto fijo");
 
@@ -492,24 +497,23 @@ double secante (int inversion, double arrayFCF[N+1], double min, double max) {
 
 	double fXi;
 	double fXiMenos1;
-	double errorPF;
+
+	double FCF = arrayFCF[0];
 
 	while (i < MAXITERACIONES) {
 
-		fXi = van (Xi, inversion, arrayFCF);
-		fXiMenos1 = van (XiMenos1, inversion, arrayFCF);
+		fXi = van(Xi, inversion, FCF);
+		fXiMenos1 = van(XiMenos1, inversion, FCF);
 
 		XiMas1 = Xi - (Xi - XiMenos1) * fXi / (fXi - fXiMenos1);
 
-		errorPF = fabs(XiMas1 - XiMenos1);
-
-		if (errorPF > 1) {
+		if (fabs(XiMas1 - XiMenos1) > 1) {
 
 			printf("No se puede resolver por puntoFijo.\n");
 
 			return FRACASO;
 
-		} else if (errorPF < 0.00005) {
+		} else if (error(XiMas1, Xi) < 1) {
 
 			break;
 
@@ -536,13 +540,47 @@ double secante (int inversion, double arrayFCF[N+1], double min, double max) {
 void buscarTIRSecante (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	//TODO semilla
-	double raiz = secante(inversion, arrayFCF, raizBiseccion - 0.001, 0.05);
+	double raiz = secante(inversion, arrayFCF, raizBiseccion - 0.1, raizBiseccion + 0.1);
 
 	imprimirRaiz(raiz, "secante");
 
 }
 
 void buscarTIREscenarios (int inversion, double arrayFCF[N+1]) {
+
+	double matriz [5][N+1];
+	struct vectorDatos datos = cargarDatos();
+
+	// a)
+	datos.costoUnitarioPotencia = datos.costoUnitarioPotencia * 0.7;
+	cargarMatriz(matriz,datos);
+
+	printf("a)\n");
+	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0.08, 0.11), "biseccion"); // 0.08757777
+
+	// b)
+	datos = cargarDatos();
+	datos.ganancias = 0;
+	cargarMatriz(matriz,datos);
+
+	printf("b)\n");
+	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0, 0.11), "biseccion");
+
+	// c)
+	datos = cargarDatos();
+	datos.costoElec = datos.costoElec * 2;
+	cargarMatriz(matriz,datos);
+
+	printf("c)\n");
+	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0, 0.11), "biseccion");
+
+	// d)
+	datos = cargarDatos();
+	datos.factorUso = 0.2;
+	cargarMatriz(matriz,datos);
+
+	printf("d)\n");
+	imprimirRaiz(biseccion(matriz[0][0], arrayFCF, 0, 0.11), "biseccion");
 
 }
 

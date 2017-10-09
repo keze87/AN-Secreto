@@ -21,7 +21,7 @@ struct vectorDatos {
 
 	// Inversion inicial
 	int potencia;
-	int costoUnitarioPotencia;
+	double costoUnitarioPotencia;
 
 	// FCFn
 	int costos;
@@ -41,3 +41,4 @@ struct vectorDatos cargarDatos ();
 char * redondear (double numero);
 double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax);
 double vanDerivada (double i, int inversion, double arrayFCF[N+1]);
+
