@@ -399,6 +399,50 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 }
 
+// PRE: decimales despues del punto
+char * incerteza (char * raiz) {
+
+	char * punteroADecimalDespuesDePunto;
+	char * retorno = malloc(sizeof(char) * 30);
+	int cantidadDeDecimales;
+
+	// el puntero es igual a la posicion de memoria del caracter despues del punto
+	// "123.456" -> "456"
+	for (int i = 0; i < strlen(raiz); i++) {
+
+		if (raiz[i] == '.') {
+
+			punteroADecimalDespuesDePunto = raiz + i + 1;
+
+			break;
+
+		}
+
+		punteroADecimalDespuesDePunto = NULL; // Para evitar un warning
+
+	}
+
+	if (punteroADecimalDespuesDePunto == NULL) {
+
+		free(retorno);
+
+		return "1";
+
+	}
+
+	cantidadDeDecimales = strlen(punteroADecimalDespuesDePunto);
+
+	strcpy(retorno, "0.");
+
+	for (int j = 1; j < cantidadDeDecimales; j++)
+		strcat(retorno,"0");
+
+	strcat(retorno,"1");
+
+	return retorno;
+
+}
+
 void imprimirRaiz (double raiz, char * metodo) {
 
 	//printf("%.16F\n", raiz);
@@ -408,7 +452,7 @@ void imprimirRaiz (double raiz, char * metodo) {
 		printf("Raiz por %s: ", metodo);
 
 		char * aux = redondear(raiz);
-		printf("%s +/- 0.01\n", aux); //TODO error
+		printf("%s +/- %s\n", aux, incerteza(aux));
 		free(aux);
 
 	}

@@ -41,4 +41,5 @@ struct vectorDatos cargarDatos ();
 char * redondear (double numero);
 double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax);
 double vanDerivada (double i, int inversion, double arrayFCF[N+1]);
+char * incerteza (char * raiz);
 
