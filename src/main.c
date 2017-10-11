@@ -1,4 +1,5 @@
-// main
+// César Ezequiel Herrera
+// Numero de grupo: 29
 
 #include "tests.h" // Pruebas Unitarias
 
@@ -80,7 +81,7 @@ struct vectorDatos cargarDatos () {
 
 }
 
-// Calcula los datos
+// Llena la matriz con los datos
 void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 	// Inversion inicial
@@ -104,6 +105,7 @@ void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 }
 
+// Devuelve un string de el numero redondeado
 char * redondear (double numero) {
 
 	char * aux = malloc(sizeof(char) * 31);
@@ -115,6 +117,8 @@ char * redondear (double numero) {
 	snprintf(auxInteger, 30, "%li", entero);
 	snprintf(auxModulo, 30, "%li", labs(entero));
 
+	// Si es mayor o igual (en modulo) a 100 devuelvo solo la parte entera
+	// Sino devuelvo un decimal o 2
 	if (strlen(auxModulo) >= 3) {
 
 		free(aux);
@@ -137,13 +141,13 @@ char * redondear (double numero) {
 
 }
 
-// Llena una matriz con los titulos y los números redondeados
+// Llena una matriz (para imprimir) con los titulos y los números redondeados
 void cargarMatrizRedondada (char * matriz[TAMMATRIZ][TAMMATRIZ], double matrizDatos[5][N+1]) {
 
 	// Pido memoria para los titulos
 	matriz[0][0] = malloc(sizeof(char) * 2);
 
-	for (int i = 1; i < 6; i++) {
+	for (int i = 1; i < TAMMATRIZ; i++) {
 
 		matriz[i][0] = malloc(sizeof(char) * 22);
 		matriz[i][4] = malloc(sizeof(char) * 4);
@@ -176,11 +180,11 @@ void cargarMatrizRedondada (char * matriz[TAMMATRIZ][TAMMATRIZ], double matrizDa
 		matriz[4][i] = redondear(matrizDatos[3][i - 1]); strcat(matriz[4][i], " $");
 
 		// FCFs
-		matriz[5][i] = redondear(matrizDatos[4][i - 1]);
+		matriz[5][i] = redondear(matrizDatos[4][i - 1]); strcat(matriz[5][i], " $");
 
 	}
 
-	// Año n
+	// Año N
 	// Inversiones
 	matriz[1][5] = redondear(matrizDatos[0][N]); strcat(matriz[1][5], " $");
 
@@ -194,7 +198,7 @@ void cargarMatrizRedondada (char * matriz[TAMMATRIZ][TAMMATRIZ], double matrizDa
 	matriz[4][5] = redondear(matrizDatos[3][N]); strcat(matriz[4][5], " $");
 
 	// FCFs
-	matriz[5][5] = redondear(matrizDatos[4][N]);
+	matriz[5][5] = redondear(matrizDatos[4][N]); strcat(matriz[5][5], " $");
 
 }
 
@@ -252,11 +256,11 @@ void imprimirLineaSeparadora (int anchos[TAMMATRIZ]) {
 }
 
 // Imprime espacios y un separador
-void imprimirSeparador (int anchoElemento, int anchoFila) {
+void imprimirSeparador (int anchoElemento, int anchoColumna) {
 
 	int aux = anchoElemento;
 
-	while (aux < anchoFila) {
+	while (aux < anchoColumna) {
 
 		printf(" ");
 
@@ -271,7 +275,7 @@ void imprimirSeparador (int anchoElemento, int anchoFila) {
 // Imprime matriz de Strings agregando separadores
 void imprimirMatriz (char * matriz[TAMMATRIZ][TAMMATRIZ]) {
 
-	int anchos [6];
+	int anchos[TAMMATRIZ];
 
 	calcularAnchoColumnas(anchos, matriz);
 
@@ -298,9 +302,9 @@ void imprimirMatriz (char * matriz[TAMMATRIZ][TAMMATRIZ]) {
 // Calcula datos y manda a imprimir
 int imprimirTabla (double matriz[5][N+1]) {
 
-	char * matrizRedondeada [TAMMATRIZ][TAMMATRIZ];
+	char * matrizRedondeada[TAMMATRIZ][TAMMATRIZ];
 
-	cargarMatrizRedondada(matrizRedondeada,matriz);
+	cargarMatrizRedondada(matrizRedondeada, matriz);
 
 	imprimirMatriz(matrizRedondeada);
 
@@ -338,7 +342,7 @@ double sumatoriaVan (double x, double arrayFCF[N+1]) {
 
 }
 
-// Io+Sum[FCF/(i+1)^n, {n, 20}]
+// Io+Sum[FCFn/(i+1)^n, {n, 20}]
 double van (double i, int inversion, double arrayFCF[N+1]) {
 
 	if (i != -1)
@@ -362,7 +366,7 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 	double puntoMedioAnterior;
 
 	if ( ! ((intervaloMin < intervaloMax) && \
-			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0))) {
+			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0)) ) {
 
 			printf("No se puede resolver por bisección.\n");
 
@@ -424,9 +428,9 @@ char * incerteza (char * raiz) {
 
 	if (punteroADecimalDespuesDePunto == NULL) {
 
-		free(retorno);
+		strcpy(retorno, "1");
 
-		return "1";
+		return retorno;
 
 	}
 
@@ -451,9 +455,12 @@ void imprimirRaiz (double raiz, char * metodo) {
 
 		printf("Raiz por %s: ", metodo);
 
-		char * aux = redondear(raiz);
-		printf("%s +/- %s\n", aux, incerteza(aux));
-		free(aux);
+		char * auxRaiz = redondear(raiz);
+		char * auxIncerteza = incerteza(auxRaiz);
+
+		printf("%s +/- %s\n", auxRaiz, auxIncerteza);
+
+		free(auxRaiz); free(auxIncerteza);
 
 	}
 
@@ -479,6 +486,7 @@ double vanDerivada (double i, int inversion, double arrayFCF[N+1]) {
 
 }
 
+// g(x) = f(x) / f'(x)
 double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 	int i = 1;
@@ -532,12 +540,12 @@ void buscarTIRPuntoFijo (double raizBiseccion, int inversion, double arrayFCF[N+
 
 }
 
-double secante (int inversion, double arrayFCF[N+1], double min, double max) {
+double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double intervaloMax) {
 
 	int i = 1;
 	double XiMas1;
-	double Xi = max;
-	double XiMenos1 = min;
+	double Xi = intervaloMax;
+	double XiMenos1 = intervaloMin;
 
 	double fXi;
 	double fXiMenos1;
@@ -709,6 +717,8 @@ int proceso () {
 }
 
 int main () {
+
+	printf("\n Cesar Ezequiel Herrera 97429\n");
 
 	correrTests(); // Pruebas Unitarias
 

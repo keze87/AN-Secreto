@@ -111,10 +111,19 @@ TEST testDerivadaVAN (void) {
 
 TEST testIncerteza (void) {
 
-	GREATEST_ASSERT_STR_EQ("1", incerteza("1000"));
-	GREATEST_ASSERT_STR_EQ("0.1", incerteza("123.1"));
-	GREATEST_ASSERT_STR_EQ("0.01", incerteza("0.02"));
-	GREATEST_ASSERT_STR_EQ("0.001", incerteza("-10.004"));
+	char * aux;
+
+	aux = incerteza("1000");
+	GREATEST_ASSERT_STR_EQ("1", aux); free(aux);
+
+	aux = incerteza("123.1");
+	GREATEST_ASSERT_STR_EQ("0.1", aux); free(aux);
+
+	aux = incerteza("0.02");
+	GREATEST_ASSERT_STR_EQ("0.01", aux); free(aux);
+
+	aux = incerteza("-10.004");
+	GREATEST_ASSERT_STR_EQ("0.001", aux); free(aux);
 
 	PASS();
 
