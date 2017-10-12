@@ -1,5 +1,5 @@
 #include "greatest.h"
-#include "main.h"
+#include "CT29.h"
 
 TEST testCalcularFCF (void) {
 

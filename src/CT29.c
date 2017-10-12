@@ -1,5 +1,11 @@
-// César Ezequiel Herrera
+// César Ezequiel Herrera 97429
 // Numero de grupo: 29
+//
+// Repo con pruebas unitarias:
+// https://github.com/keze87/CT29
+//
+// Make:
+// gcc -lm -std=c11 -Wall -pedantic -pedantic-errors -o CT29 CT29.c -I.
 
 #include "tests.h" // Pruebas Unitarias
 
@@ -406,7 +412,7 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 // PRE: decimales despues del punto
 char * incerteza (char * raiz) {
 
-	char * punteroADecimalDespuesDePunto;
+	char * punteroADecimalDespuesDePunto = NULL;
 	char * retorno = malloc(sizeof(char) * 30);
 	int cantidadDeDecimales;
 
@@ -421,8 +427,6 @@ char * incerteza (char * raiz) {
 			break;
 
 		}
-
-		punteroADecimalDespuesDePunto = NULL; // Para evitar un warning
 
 	}
 
@@ -477,6 +481,7 @@ double buscarTIRBiseccion (int inversion, double arrayFCF[N+1]) {
 
 }
 
+// (f(x + h) - f(x)) / h, h -> 0
 double vanDerivada (double i, int inversion, double arrayFCF[N+1]) {
 
 	if (i != -1)
@@ -516,7 +521,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 			return FRACASO;
 
-		} else if (error(Xi1, Xi) < 1) {
+		} else if (error(Xi1, Xi) < 1 /* % */) {
 
 			break;
 
@@ -563,7 +568,7 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 
 			return FRACASO;
 
-		} else if (error(XiMas1, Xi) < 1) {
+		} else if (error(XiMas1, Xi) < 1 /* % */) {
 
 			break;
 
@@ -645,7 +650,6 @@ void buscarTIREscenarios () {
 	printf("e)\n");
 	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 1), "biseccion");
 
-
 }
 
 void imprimirEnunciado (short enunciado) {
@@ -712,13 +716,15 @@ int proceso () {
 	imprimirEnunciado(5);
 	buscarTIREscenarios();
 
+	printf("\n");
+
 	return TRUE;
 
 }
 
 int main () {
 
-	printf("\n Cesar Ezequiel Herrera 97429\n");
+	printf("\nCesar Ezequiel Herrera 97429\n");
 
 	correrTests(); // Pruebas Unitarias
 

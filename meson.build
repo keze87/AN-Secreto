@@ -8,7 +8,6 @@ add_global_arguments([
   '-Wall',
   '-pedantic',
   '-pedantic-errors',
-  '-DHAVE_CONFIG_H',
   '-I' + meson.build_root(),
 ], language: 'c')
 
