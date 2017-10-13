@@ -133,9 +133,12 @@ char * redondear (double numero) {
 
 double potencia (double x, int n) {
 
+	if (n < 1)
+		return FRACASO;
+
 	double aux = 1;
 
-	for (int i = 1; i < n; i++) {
+	for (int i = 1; i <= n; i++) {
 
 		aux = aux * x;
 
@@ -145,6 +148,7 @@ double potencia (double x, int n) {
 
 }
 
+// Devuelve el error relativo
 double error (double Xk1, double Xk) {
 
 	return fabs(Xk1 - Xk) / fabs(Xk1) * 100;
@@ -460,13 +464,13 @@ void cargarMatriz (double matriz[5][N+1], struct vectorDatos datos) {
 
 }
 
-double sumatoriaVan (double x, double arrayFCF[N+1]) {
+double sumatoriaVan (double i, double arrayFCF[N+1]) {
 
 	double aux = 0;
 
-	for (int i = 1; i <= N; i++) {
+	for (int n = 1; n <= N; n++) {
 
-		aux = aux + arrayFCF[i] / potencia(1 + x, i);
+		aux = aux + arrayFCF[n] / potencia(1 + i, n);
 
 	}
 
@@ -536,6 +540,8 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 		}
 
+		//printf("b %d -> %F\n", i, puntoMedio); //TODO
+
 		i++;
 
 	}
@@ -548,7 +554,7 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 	int i = 1;
-	double Xi1;
+	double XiMas1;
 	double Xi = semilla;
 
 	while (i < MAXITERACIONES) {
@@ -565,27 +571,29 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		double fXi = van(Xi, inversion, arrayFCF);
 
-		Xi1 = Xi - fXi / resultadoDerivada;
+		XiMas1 = Xi - fXi / resultadoDerivada;
 
-		if (fabs(Xi1 - Xi) > 1) {
+		if (fabs(XiMas1 - Xi) > 1) {
 
 			printf("No se puede resolver por punto fijo.\n");
 
 			return FRACASO;
 
-		} else if (error(Xi1, Xi) < 1 /* % */) {
+		} else if (error(XiMas1, Xi) < 1 /* % */) {
 
 			break;
 
 		}
 
-		Xi = Xi1;
+		Xi = XiMas1;
+
+		//printf("p %d -> %F\n", i, XiMas1); //TODO
 
 		i++;
 
 	}
 
-	return Xi1;
+	return XiMas1;
 
 }
 
@@ -624,6 +632,8 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 			Xi = XiMas1;
 
 		}
+
+		//printf("s %d -> %F\n", i, XiMas1); //TODO
 
 		i++;
 

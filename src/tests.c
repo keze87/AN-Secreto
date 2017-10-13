@@ -1,6 +1,16 @@
 #include "greatest.h"
 #include "CT29.h"
 
+TEST testAuxiliares (void) {
+
+	GREATEST_ASSERT_EQ(8, potencia(2, 3));
+
+	GREATEST_ASSERT(error(0.04271, 0.042480) < 1 /* % */);
+
+	PASS();
+
+}
+
 TEST testCalcularFCF (void) {
 
 	double factorUso = 0.18 * NUMERODEPADRON / 100000;
@@ -88,7 +98,7 @@ TEST testIntervaloBiseccion (void) {
 
 	GREATEST_ASSERT_EQ(FRACASO, biseccion(-945000, arrayFCF, 1, 2));
 
-	GREATEST_ASSERT_IN_RANGE(0.04271, biseccion(-945000, arrayFCF, 0, 2), 0.006); // 0.0480957
+	GREATEST_ASSERT_IN_RANGE(0.04271, biseccion(-945000, arrayFCF, 0, 2), 0.001);
 
 	PASS();
 
@@ -102,8 +112,8 @@ TEST testDerivadaVAN (void) {
 		arrayFCF[i] = 71218.447161;
 
 	GREATEST_ASSERT_EQ_FMT((long) FRACASO, (long) vanDerivada(-1, -945000, arrayFCF), "%li");
-	GREATEST_ASSERT_EQ_FMT((long) -8570524, (long) vanDerivada(0.045, -945000, arrayFCF), "%li");
-	GREATEST_ASSERT_EQ_FMT((long) -7721529, (long) vanDerivada(0.048, -945000, arrayFCF), "%li");
+	GREATEST_ASSERT_IN_RANGE((long) -8270821, (long) vanDerivada(0.04271, -945000, arrayFCF), 100);
+	GREATEST_ASSERT_IN_RANGE((long) -7721529, (long) vanDerivada(0.048, -945000, arrayFCF), 100);
 
 	PASS();
 
@@ -136,6 +146,7 @@ int correrTests () {
 
 	GREATEST_MAIN_BEGIN();
 
+	RUN_TEST(testAuxiliares);
 	RUN_TEST(testCalcularFCF);
 	RUN_TEST(testCargarDatos);
 	RUN_TEST(testRedondeoNumero);
