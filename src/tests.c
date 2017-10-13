@@ -5,6 +5,8 @@ TEST testAuxiliares (void) {
 
 	GREATEST_ASSERT_EQ(8, potencia(2, 3));
 
+	GREATEST_ASSERT_EQ(1, potencia(0, 0));
+
 	GREATEST_ASSERT(error(0.04271, 0.042480) < 1 /* % */);
 
 	PASS();
@@ -38,8 +40,10 @@ TEST testCargarDatos (void) {
 	double factorUso = 0.18 * NUMERODEPADRON / 100000;
 	GREATEST_ASSERT_EQ(factorUso,	datos.factorUso);
 	GREATEST_ASSERT_EQ(250,			datos.costoPot);
-	GREATEST_ASSERT_IN_RANGE(0.35,	datos.ganancias[0], 0.000001); //TODO es un array
 	GREATEST_ASSERT_IN_RANGE(1.9,	datos.costoElec, 0.000001);
+
+	for (int i = 0; i <= N; i++)
+		GREATEST_ASSERT_IN_RANGE(0.35,	datos.ganancias[i], 0.000001);
 
 	PASS();
 

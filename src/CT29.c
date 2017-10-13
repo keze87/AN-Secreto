@@ -133,7 +133,7 @@ char * redondear (double numero) {
 
 double potencia (double x, int n) {
 
-	if (n < 1)
+	if (n < 0)
 		return FRACASO;
 
 	double aux = 1;
@@ -613,7 +613,7 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 
 		if (fabs(XiMas1 - XiMenos1) > 1) {
 
-			printf("No se puede resolver por punto fijo.\n");
+			printf("No se puede resolver por secante.\n");
 
 			return FRACASO;
 
@@ -686,7 +686,7 @@ void buscarTIREscenarios () {
 	cargarMatriz(matriz,datos);
 
 	printf("a)\n");
-	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0.08, 0.11), "bisección"); // 0.08757777
+	imprimirRaiz(secante(matriz[0][0], matriz[4], 0, 0.5), "secante");
 
 	// b)
 	datos = cargarDatos();
@@ -696,7 +696,7 @@ void buscarTIREscenarios () {
 	cargarMatriz(matriz,datos);
 
 	printf("b)\n");
-	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 0.13), "bisección");
+	imprimirRaiz(secante(matriz[0][0], matriz[4], 0, 0.5), "secante");
 
 	// c)
 	datos = cargarDatos();
@@ -704,7 +704,7 @@ void buscarTIREscenarios () {
 	cargarMatriz(matriz,datos);
 
 	printf("c)\n");
-	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 0.2), "bisección");
+	imprimirRaiz(secante(matriz[0][0], matriz[4], 0, 0.5), "secante");
 
 	// d)
 	datos = cargarDatos();
@@ -712,7 +712,7 @@ void buscarTIREscenarios () {
 	cargarMatriz(matriz,datos);
 
 	printf("d)\n");
-	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 0.11), "bisección");
+	imprimirRaiz(secante(matriz[0][0], matriz[4], 0, 0.09), "secante");
 
 	// e)
 	datos = cargarDatos();
@@ -724,7 +724,7 @@ void buscarTIREscenarios () {
 	cargarMatriz(matriz,datos);
 
 	printf("e)\n");
-	imprimirRaiz(biseccion(matriz[0][0], matriz[4], 0, 1), "bisección");
+	imprimirRaiz(secante(matriz[0][0], matriz[4], 0, 0.1), "secante");
 
 }
 
@@ -769,3 +769,4 @@ int main () {
 	return proceso();
 
 }
+
