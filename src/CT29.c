@@ -70,10 +70,17 @@ void imprimirEnunciado (short enunciado) {
 			break;
 
 		case 4:
-			printf("\n5) Repita el punto 3) aplicando el método de la secante.\n\n");
+			printf("\n4) Evalúe experimentalmente las condiciones de convergencia del método anterior mediante pruebas con diferentes semillas.\n");
+			printf("   Reduzca el valor de la semilla hasta encontrar el límite inferior del intervalo de convergencia. \n");
+			printf("   Luego aumente el valor de la semilla hasta encontrar el límite superior del intervalo de convergencia.\n");
+			printf("   Muestre el intervalo de convergencia obtenido.\n\n");
 			break;
 
 		case 5:
+			printf("\n5) Repita los puntos 3) y 4) aplicando el método de la secante.\n\n");
+			break;
+
+		case 7:
 			printf("\n7) Calcule la TIR del proyecto utilizando el método de la secante para los siguientes escenarios:\n");
 			printf("   a) El costo unitario de la instalación fotovoltaica se reduce un 30%%.\n");
 			printf("   b) Los proyectos solares quedan exentos del pago del impuesto a las ganancias (α=0).\n");
@@ -391,6 +398,10 @@ void imprimirRaiz (double raiz, char * metodo) {
 
 		free(auxRaiz); free(auxIncerteza);
 
+	} else {
+
+		printf("No se puede resolver por %s.\n", metodo);
+
 	}
 
 }
@@ -513,8 +524,6 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 	if ( ! ((intervaloMin < intervaloMax) && \
 			(van(intervaloMin, inversion, arrayFCF) * van(intervaloMax, inversion, arrayFCF) < 0)) ) {
 
-			printf("No se puede resolver por bisección.\n");
-
 			return FRACASO;
 
 	}
@@ -563,8 +572,6 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		if (fabs(resultadoDerivada) < MINDIVISOR) {
 
-			printf("No se puede resolver por punto fijo.\n");
-
 			return FRACASO;
 
 		}
@@ -574,8 +581,6 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 		XiMas1 = Xi - fXi / resultadoDerivada;
 
 		if (fabs(XiMas1 - Xi) > 1) {
-
-			printf("No se puede resolver por punto fijo.\n");
 
 			return FRACASO;
 
@@ -612,8 +617,6 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 		XiMas1 = Xi - (Xi - XiMenos1) * fXi / (fXi - fXiMenos1);
 
 		if (fabs(XiMas1 - XiMenos1) > 1) {
-
-			printf("No se puede resolver por secante.\n");
 
 			return FRACASO;
 
@@ -728,6 +731,162 @@ void buscarTIREscenarios () {
 
 }
 
+// El signo es para saber si quiero el límite de convergencia por derecha o izquierda
+double convPFijo (short signo, double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	if ( !(signo == 1 || signo == -1) )
+		return FRACASO;
+
+	double x = raizBiseccion;
+	double delta = 0.01;
+	int i = 1;
+
+	double Xi;
+	double XiMas1 = raizBiseccion;
+
+	while (i < MAXITERACIONES) {
+
+		// La única raíz que me importa es menor (en modulo) que 0.05
+		while (fabs(puntoFijo(inversion, arrayFCF, x)) < 0.05) {
+
+			x = x + signo * delta;
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		while (fabs(puntoFijo(inversion, arrayFCF, x)) > 0.05) {
+
+			x = x + signo * delta;
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		if (error(XiMas1, Xi) < 1 /* % */)
+			break;
+
+		i++;
+
+	}
+
+	if (puntoFijo(inversion, arrayFCF, XiMas1) == FRACASO)
+		return Xi;
+
+	return XiMas1;
+
+}
+
+void buscarIntervaloConvergenciaPF (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	double min = convPFijo(-1, raizBiseccion, inversion, arrayFCF);
+	double max = convPFijo(+1, raizBiseccion, inversion, arrayFCF);
+
+	printf("Convergencia de punto fijo: %.2F -> %.2F\n", min, max);
+
+}
+
+double convSecante (short minOMax, double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	if ( !(minOMax == 1 || minOMax == -1) )
+		return FRACASO;
+
+	short signo;
+	double x;
+	double xmin = raizBiseccion - 0.1;
+	double xmax = raizBiseccion + 0.1;
+	double delta = 0.1;
+	int i = 1;
+
+	double Xi;
+	double XiMas1 = raizBiseccion;
+
+	signo = 1;
+
+	if (minOMax == -1)
+		signo = -1;
+
+	while (i < MAXITERACIONES) {
+
+		// La única raíz que me importa es menor (en modulo) que 0.1
+		while (fabs(secante(inversion, arrayFCF, xmin, xmax)) < 0.05) {
+
+			// busco mínimo
+			if (minOMax == -1) {
+
+				xmin = xmin + signo * delta;
+				x = xmin;
+
+			} else { // máximo
+
+				xmax = xmax + signo * delta;
+				x = xmax;
+
+			}
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		while (fabs(secante(inversion, arrayFCF, xmin, xmax)) > 0.05) {
+
+			// busco mínimo
+			if (minOMax == -1) {
+
+				xmin = xmin + signo * delta;
+				x = xmin;
+
+			} else { // máximo
+
+				xmax = xmax + signo * delta;
+				x = xmax;
+
+			}
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		if (error(XiMas1, Xi) < 1 /* % */)
+			break;
+
+		i++;
+
+	}
+
+	if (puntoFijo(inversion, arrayFCF, XiMas1) == FRACASO)
+		return Xi;
+
+	return XiMas1;
+
+}
+
+void buscarIntervaloConvergenciaSec (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	double min = convSecante(-1, raizBiseccion, inversion, arrayFCF);
+	double max = convSecante(+1, raizBiseccion, inversion, arrayFCF);
+
+	printf("Convergencia de secante: %.2F -> %.2F\n", min, max); //TODO min con max raiz+0.1
+																 // 	max con min raiz-0.1
+
+}
+
 int proceso () {
 
 	struct vectorDatos datos = cargarDatos();
@@ -743,15 +902,19 @@ int proceso () {
 	imprimirTabla(matriz);
 
 	imprimirEnunciado(2);
-	raizBiseccion = buscarTIRBiseccion(	inversion, /* FCF */matriz[4]);
+	raizBiseccion = buscarTIRBiseccion(inversion, /* FCF */matriz[4]);
 
 	imprimirEnunciado(3);
-	buscarTIRPuntoFijo(raizBiseccion,	inversion, /* FCF */matriz[4]);
+	buscarTIRPuntoFijo(raizBiseccion, inversion, /* FCF */matriz[4]);
 
 	imprimirEnunciado(4);
-	buscarTIRSecante(raizBiseccion,		inversion, /* FCF */matriz[4]);
+	buscarIntervaloConvergenciaPF(raizBiseccion, inversion, /* FCF */matriz[4]);
 
 	imprimirEnunciado(5);
+	buscarTIRSecante(raizBiseccion, inversion, /* FCF */matriz[4]);
+	buscarIntervaloConvergenciaSec(raizBiseccion, inversion, /* FCF */matriz[4]);
+
+	imprimirEnunciado(7);
 	buscarTIREscenarios();
 
 	printf("\n");
