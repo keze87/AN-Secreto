@@ -389,7 +389,7 @@ void imprimirRaiz (double raiz, char * metodo) {
 
 	if (raiz != FRACASO) {
 
-		printf("Raiz por %s: ", metodo);
+		printf("Raíz por %s: ", metodo);
 
 		char * auxRaiz = redondear(raiz);
 		char * auxIncerteza = incerteza(auxRaiz);
@@ -646,6 +646,154 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 
 }
 
+// El signo es para saber si quiero el límite de convergencia por derecha o izquierda
+/*
+ *
+ * Ej: si quiero el minimo, resto x hasta que el metodo diverja, despues achico delta y sumo hasta que converja.
+ * Itero y corto cuando el error relativo sea menor a 1.
+ *
+ */
+double convPFijo (short signo, double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	if ( !(signo == 1 || signo == -1) )
+		return FRACASO;
+
+	double x = raizBiseccion;
+	double delta = 0.01;
+	int i = 1;
+
+	double Xi;
+	double XiMas1 = raizBiseccion;
+
+	while (i < MAXITERACIONES) {
+
+		// La única raíz que me importa es menor (en módulo) que 0.05
+		while (fabs(puntoFijo(inversion, arrayFCF, x)) < 0.05) {
+
+			x = x + signo * delta;
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		while (fabs(puntoFijo(inversion, arrayFCF, x)) > 0.05) {
+
+			x = x + signo * delta;
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		if (error(XiMas1, Xi) < 1 /* % */)
+			break;
+
+		i++;
+
+	}
+
+	if (puntoFijo(inversion, arrayFCF, XiMas1) == FRACASO)
+		return Xi;
+
+	return XiMas1;
+
+}
+
+double convSecante (short minOMax, double raizBiseccion, int inversion, double arrayFCF[N+1]) {
+
+	if ( !(minOMax == 1 || minOMax == -1) )
+		return FRACASO;
+
+	short signo;
+	double x;
+	double xmin = raizBiseccion - 0.1;
+	double xmax = raizBiseccion + 0.1;
+	double delta = 0.1;
+	int i = 1;
+
+	double Xi;
+	double XiMas1 = raizBiseccion;
+
+	if (minOMax == -1) {
+
+		signo = -1;
+
+	} else {
+
+		signo = 1;
+
+	}
+
+	while (i < MAXITERACIONES) {
+
+		// La única raíz que me importa es menor (en modulo) que 0.1
+		while (fabs(secante(inversion, arrayFCF, xmin, xmax)) < 0.05) {
+
+			// busco mínimo
+			if (minOMax == -1) {
+
+				xmin = xmin + signo * delta;
+				x = xmin;
+
+			} else { // máximo
+
+				xmax = xmax + signo * delta;
+				x = xmax;
+
+			}
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		while (fabs(secante(inversion, arrayFCF, xmin, xmax)) > 0.05) {
+
+			// busco mínimo
+			if (minOMax == -1) {
+
+				xmin = xmin + signo * delta;
+				x = xmin;
+
+			} else { // máximo
+
+				xmax = xmax + signo * delta;
+				x = xmax;
+
+			}
+
+		}
+
+		Xi = XiMas1;
+		XiMas1 = x;
+
+		signo = signo * -1;
+		delta = delta / 10;
+
+		if (error(XiMas1, Xi) < 1 /* % */)
+			break;
+
+		i++;
+
+	}
+
+	if (puntoFijo(inversion, arrayFCF, XiMas1) == FRACASO)
+		return Xi;
+
+	return XiMas1;
+
+}
+
 /*
  *
  * Main
@@ -731,60 +879,6 @@ void buscarTIREscenarios () {
 
 }
 
-// El signo es para saber si quiero el límite de convergencia por derecha o izquierda
-double convPFijo (short signo, double raizBiseccion, int inversion, double arrayFCF[N+1]) {
-
-	if ( !(signo == 1 || signo == -1) )
-		return FRACASO;
-
-	double x = raizBiseccion;
-	double delta = 0.01;
-	int i = 1;
-
-	double Xi;
-	double XiMas1 = raizBiseccion;
-
-	while (i < MAXITERACIONES) {
-
-		// La única raíz que me importa es menor (en modulo) que 0.05
-		while (fabs(puntoFijo(inversion, arrayFCF, x)) < 0.05) {
-
-			x = x + signo * delta;
-
-		}
-
-		Xi = XiMas1;
-		XiMas1 = x;
-
-		signo = signo * -1;
-		delta = delta / 10;
-
-		while (fabs(puntoFijo(inversion, arrayFCF, x)) > 0.05) {
-
-			x = x + signo * delta;
-
-		}
-
-		Xi = XiMas1;
-		XiMas1 = x;
-
-		signo = signo * -1;
-		delta = delta / 10;
-
-		if (error(XiMas1, Xi) < 1 /* % */)
-			break;
-
-		i++;
-
-	}
-
-	if (puntoFijo(inversion, arrayFCF, XiMas1) == FRACASO)
-		return Xi;
-
-	return XiMas1;
-
-}
-
 void buscarIntervaloConvergenciaPF (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	double min = convPFijo(-1, raizBiseccion, inversion, arrayFCF);
@@ -794,96 +888,14 @@ void buscarIntervaloConvergenciaPF (double raizBiseccion, int inversion, double 
 
 }
 
-double convSecante (short minOMax, double raizBiseccion, int inversion, double arrayFCF[N+1]) {
-
-	if ( !(minOMax == 1 || minOMax == -1) )
-		return FRACASO;
-
-	short signo;
-	double x;
-	double xmin = raizBiseccion - 0.1;
-	double xmax = raizBiseccion + 0.1;
-	double delta = 0.1;
-	int i = 1;
-
-	double Xi;
-	double XiMas1 = raizBiseccion;
-
-	signo = 1;
-
-	if (minOMax == -1)
-		signo = -1;
-
-	while (i < MAXITERACIONES) {
-
-		// La única raíz que me importa es menor (en modulo) que 0.1
-		while (fabs(secante(inversion, arrayFCF, xmin, xmax)) < 0.05) {
-
-			// busco mínimo
-			if (minOMax == -1) {
-
-				xmin = xmin + signo * delta;
-				x = xmin;
-
-			} else { // máximo
-
-				xmax = xmax + signo * delta;
-				x = xmax;
-
-			}
-
-		}
-
-		Xi = XiMas1;
-		XiMas1 = x;
-
-		signo = signo * -1;
-		delta = delta / 10;
-
-		while (fabs(secante(inversion, arrayFCF, xmin, xmax)) > 0.05) {
-
-			// busco mínimo
-			if (minOMax == -1) {
-
-				xmin = xmin + signo * delta;
-				x = xmin;
-
-			} else { // máximo
-
-				xmax = xmax + signo * delta;
-				x = xmax;
-
-			}
-
-		}
-
-		Xi = XiMas1;
-		XiMas1 = x;
-
-		signo = signo * -1;
-		delta = delta / 10;
-
-		if (error(XiMas1, Xi) < 1 /* % */)
-			break;
-
-		i++;
-
-	}
-
-	if (puntoFijo(inversion, arrayFCF, XiMas1) == FRACASO)
-		return Xi;
-
-	return XiMas1;
-
-}
-
 void buscarIntervaloConvergenciaSec (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
 	double min = convSecante(-1, raizBiseccion, inversion, arrayFCF);
 	double max = convSecante(+1, raizBiseccion, inversion, arrayFCF);
 
-	printf("Convergencia de secante: %.2F -> %.2F\n", min, max); //TODO min con max raiz+0.1
-																 // 	max con min raiz-0.1
+	printf("Convergencia de secante:\n");
+	printf("\tMínimo con intervalo máximo = %.2F: %.2F\n", raizBiseccion + 0.1, min);
+	printf("\tMáximo con intervalo mínimo = %.2F: %.2F\n", raizBiseccion - 0.1, max);
 
 }
 
