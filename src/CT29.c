@@ -559,7 +559,7 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 
 }
 
-// g(x) = f(x) / f'(x)
+// g(x) = x - f(x)
 double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 	int i = 1;
@@ -570,7 +570,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		double resultadoDerivada = vanDerivada(Xi, inversion, arrayFCF);
 
-		if (fabs(resultadoDerivada) < MINDIVISOR) {
+		if ((fabs(resultadoDerivada) < MINDIVISOR) || (fabs(resultadoDerivada) > 1)) {
 
 			return FRACASO;
 
@@ -578,7 +578,7 @@ double puntoFijo (int inversion, double arrayFCF[N+1], double semilla) {
 
 		double fXi = van(Xi, inversion, arrayFCF);
 
-		XiMas1 = Xi - fXi / resultadoDerivada;
+		XiMas1 = Xi - fXi;
 
 		if (fabs(XiMas1 - Xi) > 1) {
 
@@ -881,21 +881,31 @@ void buscarTIREscenarios () {
 
 void buscarIntervaloConvergenciaPF (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
-	double min = convPFijo(-1, raizBiseccion, inversion, arrayFCF);
-	double max = convPFijo(+1, raizBiseccion, inversion, arrayFCF);
+	if (puntoFijo(inversion,arrayFCF,raizBiseccion) != FRACASO) {
 
-	printf("Convergencia de punto fijo: %.2F -> %.2F\n", min, max);
+		double min = convPFijo(-1, raizBiseccion, inversion, arrayFCF);
+		double max = convPFijo(+1, raizBiseccion, inversion, arrayFCF);
+
+		printf("Convergencia de punto fijo: %.2F -> %.2F\n", min, max);
+
+	} else
+		printf("Metodo no converge.\n");
 
 }
 
 void buscarIntervaloConvergenciaSec (double raizBiseccion, int inversion, double arrayFCF[N+1]) {
 
-	double min = convSecante(-1, raizBiseccion, inversion, arrayFCF);
-	double max = convSecante(+1, raizBiseccion, inversion, arrayFCF);
+	if (secante(inversion,arrayFCF,raizBiseccion - 0.1, raizBiseccion + 0.1) != FRACASO) {
 
-	printf("Convergencia de secante:\n");
-	printf("\tMínimo con intervalo máximo = %.2F: %.2F\n", raizBiseccion + 0.1, min);
-	printf("\tMáximo con intervalo mínimo = %.2F: %.2F\n", raizBiseccion - 0.1, max);
+		double min = convSecante(-1, raizBiseccion, inversion, arrayFCF);
+		double max = convSecante(+1, raizBiseccion, inversion, arrayFCF);
+
+		printf("Convergencia de secante:\n");
+		printf("\tMínimo con intervalo máximo = %.2F: %.2F\n", raizBiseccion + 0.1, min);
+		printf("\tMáximo con intervalo mínimo = %.2F: %.2F\n", raizBiseccion - 0.1, max);
+
+	} else
+		printf("Metodo no converge.\n");
 
 }
 
