@@ -102,7 +102,7 @@ void imprimirEnunciado (short enunciado) {
  *
  */
 
-// Devuelve un string de el numero redondeado
+// Devuelve un string del número redondeado
 char * redondear (double numero) {
 
 	char * aux = malloc(sizeof(char) * 31);
@@ -298,7 +298,7 @@ void calcularAnchoColumnas (int anchos[TAMMATRIZ], char * matriz[TAMMATRIZ][TAMM
 
 }
 
-// Imprime linea entre filas
+// Imprime línea entre filas
 void imprimirLineaSeparadora (int anchos[TAMMATRIZ]) {
 
 	int i = 0;
@@ -649,7 +649,7 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 // El signo es para saber si quiero el límite de convergencia por derecha o izquierda
 /*
  *
- * Ej: si quiero el minimo, resto x hasta que el metodo diverja, despues achico delta y sumo hasta que converja.
+ * Ej: si quiero el mínimo, resto x hasta que el método diverja, después achico delta y sumo hasta que converja.
  * Itero y corto cuando el error relativo sea menor a 1.
  *
  */
