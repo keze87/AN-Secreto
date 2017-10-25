@@ -102,8 +102,42 @@ void imprimirEnunciado (short enunciado) {
  *
  */
 
+// PRE: numero con decimales
+char * redondearCero (double numero) {
+
+	char * aux = malloc(sizeof(char) * 31);
+	char * retorno = malloc(sizeof(char) * 31);
+	int i = 2;
+
+	snprintf(aux, 30, "%.16f", fabs(numero));
+
+	if (numero < 0)
+		strcpy(retorno, "-0.");
+	else
+		strcpy(retorno, "0.");
+
+	while (aux[i] != '\0') {
+
+		strncat(retorno, &aux[i], 1);
+
+		if (aux[i] != '0')
+			break;
+
+		i++;
+
+	}
+
+	strncat(retorno, &aux[i + 1], 2);
+
+	return retorno;
+
+}
+
 // Devuelve un string del número redondeado
 char * redondear (double numero) {
+
+	if ((fabs(numero) < 1) && (numero != 0))
+		return redondearCero(numero);
 
 	char * aux = malloc(sizeof(char) * 31);
 	char * auxInteger = malloc(sizeof(char) * 31);
@@ -198,7 +232,7 @@ char * incerteza (char * raiz) {
 	for (int j = 1; j < cantidadDeDecimales; j++)
 		strcat(retorno,"0");
 
-	strcat(retorno,"1");
+	strcat(retorno,"5");
 
 	return retorno;
 

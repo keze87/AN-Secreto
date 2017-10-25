@@ -63,7 +63,7 @@ TEST testRedondeoNumero (void) {
 	GREATEST_ASSERT_STR_EQ("1000",	aux); free(aux);
 
 	aux = redondear(-0.0006);
-	GREATEST_ASSERT_STR_EQ("-0.00",	aux); free(aux);
+	GREATEST_ASSERT_STR_EQ("-0.000600",	aux); free(aux);
 
 	aux = redondear(71218.4504876);
 	GREATEST_ASSERT_STR_EQ("71218",	aux); free(aux);
@@ -131,13 +131,13 @@ TEST testIncerteza (void) {
 	GREATEST_ASSERT_STR_EQ("1", aux); free(aux);
 
 	aux = incerteza("123.1");
-	GREATEST_ASSERT_STR_EQ("0.1", aux); free(aux);
+	GREATEST_ASSERT_STR_EQ("0.5", aux); free(aux);
 
 	aux = incerteza("0.02");
-	GREATEST_ASSERT_STR_EQ("0.01", aux); free(aux);
+	GREATEST_ASSERT_STR_EQ("0.05", aux); free(aux);
 
 	aux = incerteza("-10.004");
-	GREATEST_ASSERT_STR_EQ("0.001", aux); free(aux);
+	GREATEST_ASSERT_STR_EQ("0.005", aux); free(aux);
 
 	PASS();
 
