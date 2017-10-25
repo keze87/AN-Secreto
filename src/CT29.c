@@ -129,6 +129,8 @@ char * redondearCero (double numero) {
 
 	strncat(retorno, &aux[i + 1], 2);
 
+	free(aux);
+
 	return retorno;
 
 }
