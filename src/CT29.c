@@ -221,7 +221,7 @@ char * incerteza (char * raiz) {
 
 	if (punteroADecimalDespuesDePunto == NULL) {
 
-		strcpy(retorno, "1");
+		strcpy(retorno, "0.5");
 
 		return retorno;
 
@@ -231,7 +231,7 @@ char * incerteza (char * raiz) {
 
 	strcpy(retorno, "0.");
 
-	for (int j = 1; j < cantidadDeDecimales; j++)
+	for (int j = 1; j <= cantidadDeDecimales; j++)
 		strcat(retorno,"0");
 
 	strcat(retorno,"5");
@@ -569,6 +569,8 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 		double puntoMedioAnterior = puntoMedio;
 		puntoMedio = (intervaloMin + intervaloMax) / 2;
 
+		//printf("b %d -> %F\n", i, puntoMedio); //TODO
+
 		if ((van(puntoMedio, inversion, arrayFCF) == 0) || (error(puntoMedio, puntoMedioAnterior) < 1 /* % */)) {
 
 			break; // Encontré solución
@@ -584,8 +586,6 @@ double biseccion (int inversion, double arrayFCF[N+1], double intervaloMin, doub
 			intervaloMin = puntoMedio;
 
 		}
-
-		//printf("b %d -> %F\n", i, puntoMedio); //TODO
 
 		i++;
 
@@ -652,6 +652,8 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 
 		XiMas1 = Xi - (Xi - XiMenos1) * fXi / (fXi - fXiMenos1);
 
+		//printf("s %d -> %F\n", i, XiMas1); //TODO
+
 		if (fabs(XiMas1 - XiMenos1) > 1) {
 
 			return FRACASO;
@@ -671,8 +673,6 @@ double secante (int inversion, double arrayFCF[N+1], double intervaloMin, double
 			Xi = XiMas1;
 
 		}
-
-		//printf("s %d -> %F\n", i, XiMas1); //TODO
 
 		i++;
 
@@ -925,7 +925,7 @@ void buscarIntervaloConvergenciaPF (double raizBiseccion, int inversion, double 
 		printf("Convergencia de punto fijo: %.2F -> %.2F\n", min, max);
 
 	} else
-		printf("Metodo no converge.\n");
+		printf("Método no converge.\n");
 
 }
 
@@ -941,7 +941,7 @@ void buscarIntervaloConvergenciaSec (double raizBiseccion, int inversion, double
 		printf("\tMáximo con intervalo mínimo = %.2F: %.2F\n", raizBiseccion - 0.1, max);
 
 	} else
-		printf("Metodo no converge.\n");
+		printf("Método no converge.\n");
 
 }
 

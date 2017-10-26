@@ -128,16 +128,16 @@ TEST testIncerteza (void) {
 	char * aux;
 
 	aux = incerteza("1000");
-	GREATEST_ASSERT_STR_EQ("1", aux); free(aux);
-
-	aux = incerteza("123.1");
 	GREATEST_ASSERT_STR_EQ("0.5", aux); free(aux);
 
-	aux = incerteza("0.02");
+	aux = incerteza("123.1");
 	GREATEST_ASSERT_STR_EQ("0.05", aux); free(aux);
 
-	aux = incerteza("-10.004");
+	aux = incerteza("0.02");
 	GREATEST_ASSERT_STR_EQ("0.005", aux); free(aux);
+
+	aux = incerteza("-10.004");
+	GREATEST_ASSERT_STR_EQ("0.0005", aux); free(aux);
 
 	PASS();
 
